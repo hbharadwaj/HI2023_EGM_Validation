@@ -12,11 +12,19 @@
 #include <THStack.h>        // needed for THStack
 #include <TLatex.h>         // needed for TLatex
 #include <TFile.h>          // needed for TFile
-#include <TGraphAsymmErrors.h>    // needed for TGraphAsymmErrors
+
+#include <TEfficiency.h>            // needed for TEfficiency
+#include <TGraphAsymmErrors.h>      // needed for TGraphAsymmErrors
+#include <TLine.h>                  // needed for TLine
+#include <TSystemDirectory.h>       // needed for TSystemDirectory
+#include <TSystemFile.h>            // needed for TSystemFile
 
 #include <iostream>         // needed for I/O
+#include <string>           // needed for string
 
-TString label="Run_374289";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
+using namespace std;
+
+TString label="Run_374322";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
 TString Tag = "_looseID_2023_10_01";
 TString output_path = "./";
 TFile *fout;
@@ -49,8 +57,8 @@ float hlt_max = 90;
 void Plot_hist(std::vector<TH1F*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
 void Plot_Graph(std::vector<TGraphAsymmErrors*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
 void overlay_runs(std::vector<TH1D*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
-void GetFiles(char const* input, vector<TString>& files, int file_limit=99999);
-void FillChain(TChain& chain, vector<string>& files);
+void GetFiles(char const* input,std::vector<TString>& files, int file_limit=99999);
+void FillChain(TChain& chain,std::vector<TString>& files);
 void displayProgress(long current, long max);
 double dr(float eta1, float phi1, float eta2, float phi2) {
     float deta = TMath::Abs(eta1 - eta2);
@@ -77,23 +85,23 @@ void Data_plot_pho_ele(){
 
     int nfiles = 99999; // Can reduce to test if the script runs
     // Common directory
-    TString input_dir_rawprime  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374289_HIExpressRawPrime_withDFinder_2023-09-26/0000/";
-    vector<TString> files;
+    TString input_dir_rawprime  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374322_HIExpressRawPrime_withDFinder_2023-09-27/0000/";
+    std::vector<TString> files;
     GetFiles(input_dir_rawprime.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374289_HIExpressRawPrime \n";
-    Data_fill_pho_ele(files,"run374289_HIExpressRawPrime",true);
+    std::cout<<"Got "<<files.size()<<" files for run374322_HIExpressRawPrime \n";
+    Data_fill_pho_ele(files,"run374322_HIExpressRawPrime",true);
 
-    TString input_dir_raw  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374289_HIExpress_withDFinder_2023-09-26/0000/";
+    TString input_dir_raw  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374322_HIExpress_withDFinder_2023-09-27/0000/";
     files.clear();
     GetFiles(input_dir_raw.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374289_HIExpressRaw\n";
-    Data_fill_pho_ele(files,"run374289_HIExpressRaw",true);
+    std::cout<<"Got "<<files.size()<<" files for run374322_HIExpressRaw\n";
+    Data_fill_pho_ele(files,"run374322_HIExpressRaw",true);
 
-    TString input_dir_physics_rawprime  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374289_HIPhysicsRawPrime0_withDFinder_2023-09-26/0000/";
+    TString input_dir_physics_rawprime  = "/eos/cms/store/group/phys_heavyions/jmijusko/run3RapidValidation/PbPb2023_run374322_PhysicsHIPhysicsRawPrime0_withDFinder_2023-09-28/0000/";
     files.clear();
     GetFiles(input_dir_physics_rawprime.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374289_HIPhysicsRawPrime\n";
-    Data_fill_pho_ele(files,"run374289_HIPhysicsRawPrime",true);
+    std::cout<<"Got "<<files.size()<<" files for run374322_HIPhysicsRawPrime\n";
+    Data_fill_pho_ele(files,"run374322_HIPhysicsRawPrime",true);
 
     std::cout<<"Output_"<<label<<".root file created\n";
 
@@ -102,12 +110,12 @@ void Data_plot_pho_ele(){
     fout = TFile::Open(DIR+"/Output_"+label+Tag+".root", "UPDATE");
 
     // Overlay
-    if(flag_plot){
+    if(flag_plot && files.size()>0){
 
         std::vector<std::vector<TString>>dirlist_name = {
-            {"run374289_HIExpressRawPrime","Express Raw Prime"},
-            {"run374289_HIExpressRaw"     ,"Express Raw"},
-            {"run374289_HIPhysicsRawPrime","Physics Raw Prime"}
+            {"run374322_HIExpressRawPrime","Express Raw Prime"},
+            {"run374322_HIExpressRaw"     ,"Express Raw"},
+            {"run374322_HIPhysicsRawPrime","Physics Raw Prime"}
         };
 
         std::vector<TString>histlist = {
@@ -344,7 +352,7 @@ void Data_plot_pho_ele(){
     fout->Close();
 }
 
-void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_t isData=true){
+void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_t isData){
     // in_file_path = Directory name for the specified Data Run
     // in_label = Corresponding legend label
 
@@ -870,7 +878,7 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
         float scale = 1;
         if(!isData) scale*=weight; //*Ncoll[hiBin];
 
-        int pho_index=-1, genin=-1;
+        int pho_index=-1;
         float Etmax=-1;
         // if(pprimaryVertexFilter)
         // std::cout<<"Event = "<<iEntry<<"    photon = "<<phoEt->size()<<"\t pprimaryVertexFilter ="<<pprimaryVertexFilter<<"\n";
@@ -1043,6 +1051,8 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
                         if(eleEoverPInv->at(lead_ele_index)>=0.1065) continue;
                         flagLooseEle=true;
                     }
+
+                    if(!flagLooseEle) continue;
 
                     h_lead_ele_Pt[ieta][icent]->Fill(                elePt->at(lead_ele_index) ,scale);
                     h_lead_ele_eta[ieta][icent]->Fill(               eleEta->at(lead_ele_index) ,scale);
@@ -1363,7 +1373,7 @@ void overlay_runs(std::vector<TH1D*> hist,std::vector<TString> histname,TString 
     if(opt.Contains("opt"))
         drawopt = eopt.back();
     gStyle->SetPalette(1);
-    TColor *pal = new TColor();
+    // TColor *pal = new TColor();
     // good for primary marker colors      
 
     /*                                                                                       
@@ -1830,23 +1840,23 @@ void Plot_Graph(std::vector<TGraphAsymmErrors*> hist,std::vector<TString> histna
     if(opt.Contains("log")) gStyle->SetOptLogy(0);
 }
 
-void GetFiles(char const* input, vector<TString>& files, int file_limit){
+void GetFiles(char const* input, std::vector<TString>& files, int file_limit) {
     TSystemDirectory dir(input, input);
     TList *list = dir.GetListOfFiles();
 
     if (list) {
         TSystemFile *file;
-        string fname;
+        std::string fname;
         TIter next(list);
         while ((file = (TSystemFile*) next())) {
             fname = file->GetName();
 
-            if (file->IsDirectory() && (fname.find(".") == string::npos)) {
-                string newDir = string(input) + fname + "/";
+            if (file->IsDirectory() && (fname.find(".") == std::string::npos)) {
+                std::string newDir = std::string(input) + fname + "/";
                 GetFiles(newDir.c_str(), files, file_limit);
             }
-            else if ((fname.find(".root") != string::npos)) {
-                files.push_back(string(input) + fname);
+            else if ((fname.find(".root") != std::string::npos)) {
+                files.push_back(std::string(input) + fname);
                 // cout << files.back() << endl;
                 if(files.size()>file_limit) return;
             }
@@ -1856,9 +1866,9 @@ void GetFiles(char const* input, vector<TString>& files, int file_limit){
     return;
 }
 
-void FillChain(TChain& chain, vector<string>& files) {
+void FillChain(TChain& chain, std::vector<TString>& files) {
     for (auto file : files) {
-        chain.Add(file.c_str());
+        chain.Add(file.Data());
     }
 }
 
@@ -1892,7 +1902,7 @@ void displayProgress(long current, long max){
    cerr.flush();
 }
 
-int main(int argc, char* argv[]){
+int main(){ // int argc, char* argv[]
     // Run with 
     // ./Data_plot_pho_ele
 
