@@ -24,7 +24,7 @@
 
 using namespace std;
 
-TString label="Run_374345";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
+TString label="Run_374354";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
 TString Tag = "_looseID_2023_10_01";
 TString output_path = "./";
 TFile *fout;
@@ -85,23 +85,23 @@ void Data_plot_pho_ele(){
 
     int nfiles = 99999; // Can reduce to test if the script runs
     // Common directory
-    TString input_dir_rawprime  = "/eos/cms/store/group/phys_heavyions/jmijusko/run3RapidValidation/PbPb2023_run374345_HIExpressRawPrime_withDFinder_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374345_HIExpressRawPrime_withDFinder_2023-09-28/230928_145411/0000/";
+    TString input_dir_rawprime  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374354_HIExpressRawPrime_noEmap_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374354_HIExpressRawPrime_noEmap_2023-09-28/230929_025126/0000/";
     std::vector<TString> files;
     GetFiles(input_dir_rawprime.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374345_HIExpressRawPrime \n";
-    Data_fill_pho_ele(files,"run374345_HIExpressRawPrime",true);
+    std::cout<<"Got "<<files.size()<<" files for run374354_HIExpressRawPrime \n";
+    Data_fill_pho_ele(files,"run374354_HIExpressRawPrime",true);
 
-    TString input_dir_raw  = "/eos/cms/store/group/phys_heavyions/jmijusko/run3RapidValidation/PbPb2023_run374345_HIExpress_withDFinder_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374345_HIExpress_withDFinder_2023-09-28/230928_153846/0000/";
+    TString input_dir_raw  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374354_HIExpress_noEmap_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374354_HIExpress_noEmap_2023-09-28/230929_025024/0000/";
     files.clear();
     GetFiles(input_dir_raw.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374345_HIExpressRaw\n";
-    Data_fill_pho_ele(files,"run374345_HIExpressRaw",true);
+    std::cout<<"Got "<<files.size()<<" files for run374354_HIExpressRaw\n";
+    Data_fill_pho_ele(files,"run374354_HIExpressRaw",true);
 
-    TString input_dir_physics_rawprime  = "/eos/cms/store/group/phys_heavyions/mstojano/run3RapidValidation/PbPb2023_run374345_PhysicsHIPhysicsRawPrime0_2023-09-29/CRAB_UserFiles/crab_PbPb2023_run374345_PhysicsHIPhysicsRawPrime0_2023-09-29/230929_151240/0000/";
+    TString input_dir_physics_rawprime  = "/eos/cms/store/group/phys_heavyions/mstojano/run3RapidValidation/PbPb2023_run374354_PhysicsHIPhysicsRawPrime0_2023-09-29/CRAB_UserFiles/crab_PbPb2023_run374354_PhysicsHIPhysicsRawPrime0_2023-09-29/230929_151251/0000/";
     files.clear();
     GetFiles(input_dir_physics_rawprime.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374345_HIPhysicsRawPrime\n";
-    Data_fill_pho_ele(files,"run374345_HIPhysicsRawPrime",true);
+    std::cout<<"Got "<<files.size()<<" files for run374354_HIPhysicsRawPrime\n";
+    Data_fill_pho_ele(files,"run374354_HIPhysicsRawPrime",true);
 
     std::cout<<"Output_"<<label<<".root file created\n";
 
@@ -113,9 +113,9 @@ void Data_plot_pho_ele(){
     if(flag_plot && files.size()>0){
 
         std::vector<std::vector<TString>>dirlist_name = {
-            {"run374345_HIExpressRawPrime","Express Raw Prime"},
-            {"run374345_HIExpressRaw"     ,"Express Raw"},
-            {"run374345_HIPhysicsRawPrime","Physics Raw Prime"}
+            {"run374354_HIExpressRawPrime","Express Raw Prime"},
+            {"run374354_HIExpressRaw"     ,"Express Raw"},
+            {"run374354_HIPhysicsRawPrime","Physics Raw Prime"}
         };
 
         std::vector<TString>histlist = {
