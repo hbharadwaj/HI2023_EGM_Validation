@@ -24,8 +24,8 @@
 
 using namespace std;
 
-TString label="Run_374354";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
-TString Tag = "_looseID_2023_10_01";
+TString label="Run_374345_374731";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
+TString Tag = "_PromptReco_2023_10_05";
 TString output_path = "./";
 TFile *fout;
 // TCanvas c;
@@ -50,11 +50,11 @@ std::vector<int> max_cent = {200, 60, 200};
 const std::size_t ncent = 3;  
 
 int trig_nbins = 15;
-float l1_max = 45;
+float l1_max = 60;
 float hlt_max = 90;
 
 // personal histogram plotting script 
-void Plot_hist(std::vector<TH1F*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
+void Plot_hist(std::vector<TH1D*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
 void Plot_Graph(std::vector<TGraphAsymmErrors*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
 void overlay_runs(std::vector<TH1D*>,std::vector<TString> ,TString opt="label",std::vector<TString> eopt={"end"});
 void GetFiles(char const* input,std::vector<TString>& files, int file_limit=99999);
@@ -83,25 +83,42 @@ void Data_plot_pho_ele(){
     fout = new TFile(DIR+"/Output_"+label+Tag+".root", "UPDATE");
     fout->cd();
 
-    int nfiles = 99999; // Can reduce to test if the script runs
-    // Common directory
-    TString input_dir_rawprime  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374354_HIExpressRawPrime_noEmap_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374354_HIExpressRawPrime_noEmap_2023-09-28/230929_025126/0000/";
+    int nfiles = 999999; // Can reduce to test if the script runs
     std::vector<TString> files;
-    GetFiles(input_dir_rawprime.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374354_HIExpressRawPrime \n";
-    Data_fill_pho_ele(files,"run374354_HIExpressRawPrime",true);
+    // Common directory
+    // files.clear();
+    // TString input_dir_rawprime  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374354_HIExpressRawPrime_noEmap_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374354_HIExpressRawPrime_noEmap_2023-09-28/230929_025126/0000/";
+    // GetFiles(input_dir_rawprime.Data(), files,nfiles);
+    // std::cout<<"Got "<<files.size()<<" files for run374354_HIExpressRawPrime \n";
+    // Data_fill_pho_ele(files,"run374354_HIExpressRawPrime",true);
 
-    TString input_dir_raw  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374354_HIExpress_noEmap_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374354_HIExpress_noEmap_2023-09-28/230929_025024/0000/";
-    files.clear();
-    GetFiles(input_dir_raw.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374354_HIExpressRaw\n";
-    Data_fill_pho_ele(files,"run374354_HIExpressRaw",true);
+    // files.clear();
+    // TString input_dir_raw  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374354_HIExpress_noEmap_2023-09-28/CRAB_UserFiles/crab_PbPb2023_run374354_HIExpress_noEmap_2023-09-28/230929_025024/0000/";
+    // GetFiles(input_dir_raw.Data(), files,nfiles);
+    // std::cout<<"Got "<<files.size()<<" files for run374354_HIExpressRaw\n";
+    // Data_fill_pho_ele(files,"run374354_HIExpressRaw",true);
 
-    TString input_dir_physics_rawprime  = "/eos/cms/store/group/phys_heavyions/mstojano/run3RapidValidation/PbPb2023_run374354_PhysicsHIPhysicsRawPrime0_2023-09-29/CRAB_UserFiles/crab_PbPb2023_run374354_PhysicsHIPhysicsRawPrime0_2023-09-29/230929_151251/0000/";
+    // files.clear();
+    // TString input_dir_physics_rawprime  = "/eos/cms/store/group/phys_heavyions/mstojano/run3RapidValidation/PbPb2023_run374354_PhysicsHIPhysicsRawPrime0_2023-09-29/CRAB_UserFiles/crab_PbPb2023_run374354_PhysicsHIPhysicsRawPrime0_2023-09-29/230929_151251/0000/";
+    // GetFiles(input_dir_physics_rawprime.Data(), files,nfiles);
+    // std::cout<<"Got "<<files.size()<<" files for run374354_HIPhysicsRawPrime\n";
+    // Data_fill_pho_ele(files,"run374354_HIPhysicsRawPrime",true);
+
     files.clear();
-    GetFiles(input_dir_physics_rawprime.Data(), files,nfiles);
-    std::cout<<"Got "<<files.size()<<" files for run374354_HIPhysicsRawPrime\n";
-    Data_fill_pho_ele(files,"run374354_HIPhysicsRawPrime",true);
+    TString input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/bharikri/run3RapidValidation/rapidValidationForest_13_2_5_patch2_PbPb2023_EGM_HIPhysicsRawPrime0_2023-10-05/";
+    GetFiles(input_dir_promptreco.Data(), files,nfiles);
+    // input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/wangj/Forest2023/HIPhysicsRawPrime4/crab_HiForestMINIAOD_230930_HIPhysicsRawPrime4_374354_Dpt2trk1/231001_010449/0000/";
+    // GetFiles(input_dir_promptreco.Data(), files,nfiles);
+    // input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/wangj/Forest2023/HIPhysicsRawPrime5/crab_HiForestMINIAOD_230930_HIPhysicsRawPrime5_374354_Dpt2trk1/231001_010540/0000/";
+    // GetFiles(input_dir_promptreco.Data(), files,nfiles);
+    // input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/wangj/Forest2023/HIPhysicsRawPrime6/crab_HiForestMINIAOD_230930_HIPhysicsRawPrime6_374354_Dpt2trk1/231001_011111/0000/";
+    // GetFiles(input_dir_promptreco.Data(), files,nfiles);
+    // input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/wangj/Forest2023/HIPhysicsRawPrime8/crab_HiForestMINIAOD_230930_HIPhysicsRawPrime8_374354_Dpt2trk1/231001_011439/0000/";
+    // GetFiles(input_dir_promptreco.Data(), files,nfiles);
+    // input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/wangj/Forest2023/HIPhysicsRawPrime9/crab_HiForestMINIAOD_230930_HIPhysicsRawPrime9_374354_Dpt2trk1/231001_011507/0000/";
+    // GetFiles(input_dir_promptreco.Data(), files,nfiles);
+    std::cout<<"Got "<<files.size()<<" files for run374345_374731_PromptHIPhysicsRawPrime\n";
+    Data_fill_pho_ele(files,"run374345_374731_PromptHIPhysicsRawPrime",true);
 
     std::cout<<"Output_"<<label<<".root file created\n";
 
@@ -110,12 +127,13 @@ void Data_plot_pho_ele(){
     fout = TFile::Open(DIR+"/Output_"+label+Tag+".root", "UPDATE");
 
     // Overlay
-    if(flag_plot && files.size()>0){
+    if(flag_plot){
 
         std::vector<std::vector<TString>>dirlist_name = {
-            {"run374354_HIExpressRawPrime","Express Raw Prime"},
-            {"run374354_HIExpressRaw"     ,"Express Raw"},
-            {"run374354_HIPhysicsRawPrime","Physics Raw Prime"}
+            // {"run374354_HIExpressRawPrime","Express Raw Prime"},
+            // {"run374354_HIExpressRaw"     ,"Express Raw"},
+            {"run374345_374731_PromptHIPhysicsRawPrime","Physics Prompt reco 0"},
+            // {"run374354_HIPhysicsRawPrime","Physics Raw Prime"},
         };
 
         std::vector<TString>histlist = {
@@ -196,13 +214,13 @@ void Data_plot_pho_ele(){
             "HLT_HIDoubleEle15GsfMass50_v9_ele_et"
         };
 
-        for (std::size_t icent = 0; icent <= 0; ++icent){ // ncent {0-100, 0-30, 30-100} 
+        for (std::size_t icent = 0; icent <= 2; ++icent){ // ncent {0-100, 0-30, 30-100} 
        
-            for (std::size_t ieta = 2; ieta <=2; ++ieta){ //neta   {|eta|<1.44, 1.566<|eta|<2.1, 0<|eta|<2.4} 
+            for (std::size_t ieta = 0; ieta <=2; ++ieta){ //neta   {|eta|<1.44, 1.566<|eta|<2.1, 0<|eta|<2.4} 
                 int temp_hist_index = 1;
 
 
-                std::vector<TString>sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>20","Loose ID"}; // ,"NOT GEN MATCHED"
+                std::vector<TString>sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>20","Only Quality cuts","MinBias+Photon+Electron triggers"}; // ,"NOT GEN MATCHED"
 
                 for(TString input_hist:histlist){
                     TString outplotname = input_hist;   
@@ -215,14 +233,21 @@ void Data_plot_pho_ele(){
 
                     for(std::size_t i_file = 0; i_file<dirlist_name.size();i_file++){
                         TH1D *h_temp = (TH1D*)fout->Get(Form("%s/%s",dirlist_name[i_file][0].Data(),input_histname.Data()));
+                        if(!h_temp){ std::cout<<input_histname<<" \t histogram doesn't exist\n"; break; }
                         h.push_back((TH1D*)h_temp->Clone());
                         hname.push_back(dirlist_name[i_file][1]);
                     }
                     hname.push_back(Form("canvas_%s",input_histname.Data()));
 
                     fout->cd();
-                    overlay_runs(h,hname,"right_norm_width",sel);
+                    if(dirlist_name.size()>=2){
+                        overlay_runs(h,hname,"right_norm_width",sel);
+                    }
+                    else{
+                        Plot_hist(h,hname,"right_norm_width",sel);
+                    }
                     TCanvas *c_temp = (TCanvas*)fout->Get(Form("canvas_%s",input_histname.Data()));
+                    if(!c_temp){ std::cout<<"Combined PDF not saved\n"; break; }
                     c_temp->Draw();
                     if(temp_hist_index==1){
                         // c_temp->Print("Plot_Photon_electron.pdf");
@@ -360,7 +385,7 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
 
     for(TString temp_path:in_file_path){
         // std:cout<<"file path = "<<temp_path+input_pho_tree<<"\n";
-        if(temp_path.Contains("_31.root")) continue; // Raw Prime crab jobs failed but exists in Raw
+        // if(temp_path.Contains("_31.root")) continue; // Raw Prime crab jobs failed but exists in Raw
 
         photonTree.Add(temp_path+input_pho_tree);
         HiTree.Add(temp_path+input_HiTree);
@@ -372,10 +397,12 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
     // Variables
 
         Int_t hiBin=-1;
+        Float_t hiHF = -1; 
         Float_t weight = 1; 
         Float_t pthat=0;
 
         HiTree.SetBranchAddress("hiBin", &hiBin);
+        HiTree.SetBranchAddress("hiHF", &hiHF);
         if(HiTree.GetBranch("weight") && !isData)
             HiTree.SetBranchAddress("weight", &weight);
         if(HiTree.GetBranch("pthat") && !isData)
@@ -409,9 +436,9 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
         std::vector<float>*  pho_trackIsoR3PtCut20 = 0;
         std::vector<float>*  phoSigmaEtaEta_2012 = 0;
 
-        std::vector<float>*  pfcIso3subUE = 0;
-        std::vector<float>*  pfnIso3subUE = 0;
-        std::vector<float>*  pfpIso3subUE = 0; //! For MiniAOD by default this does not exclude the cone!!
+        std::vector<float>*  pfcIso3subUEec = 0;
+        std::vector<float>*  pfnIso3subUEec = 0;
+        std::vector<float>*  pfpIso3subUEec = 0; 
 
         std::vector<float>*  pfpIso3subSCsubUE = 0; //! For MiniAOD by default this does not exclude the cone!!
 
@@ -487,9 +514,9 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
         photonTree.SetBranchAddress("pho_hcalRechitIsoR3",     &pho_hcalRechitIsoR3);
         photonTree.SetBranchAddress("pho_trackIsoR3PtCut20",   &pho_trackIsoR3PtCut20);
         photonTree.SetBranchAddress("phoSigmaEtaEta_2012",     &phoSigmaEtaEta_2012);
-        photonTree.SetBranchAddress("pfcIso3subUE",            &pfcIso3subUE);
-        photonTree.SetBranchAddress("pfnIso3subUE",            &pfnIso3subUE);
-        photonTree.SetBranchAddress("pfpIso3subUE",            &pfpIso3subUE);
+        photonTree.SetBranchAddress("pfcIso3subUEec",          &pfcIso3subUEec);
+        photonTree.SetBranchAddress("pfnIso3subUEec",          &pfnIso3subUEec);
+        photonTree.SetBranchAddress("pfpIso3subUEec",          &pfpIso3subUEec);
 
         photonTree.SetBranchAddress("pfpIso3subSCsubUE",       &pfpIso3subSCsubUE);
 
@@ -536,13 +563,13 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
         photonTree.SetBranchAddress("eleIP3D",                 &eleIP3D);
         photonTree.SetBranchAddress("eleEn",                   &eleEn);
 
-        int pprimaryVertexFilter = 0;
-        int pclusterCompatibilityFilter = 0;
-        int pphfCoincFilter2Th4 = 0;
+        int pprimaryVertexFilter = 1;           // Pass if it doesn't exist in the Forest
+        int pclusterCompatibilityFilter = 1;
+        int pphfCoincFilter2Th4 = 1;
 
-        skimanalysis.SetBranchAddress("pprimaryVertexFilter",  &pprimaryVertexFilter);
-        skimanalysis.SetBranchAddress("pclusterCompatibilityFilter",  &pclusterCompatibilityFilter);
-        skimanalysis.SetBranchAddress("pphfCoincFilter2Th4",  &pphfCoincFilter2Th4);
+        if(skimanalysis.GetBranch("pprimaryVertexFilter")) skimanalysis.SetBranchAddress("pprimaryVertexFilter",  &pprimaryVertexFilter);
+        if(skimanalysis.GetBranch("pclusterCompatibilityFilter")) skimanalysis.SetBranchAddress("pclusterCompatibilityFilter",  &pclusterCompatibilityFilter);
+        if(skimanalysis.GetBranch("pphfCoincFilter2Th4")) skimanalysis.SetBranchAddress("pphfCoincFilter2Th4",  &pphfCoincFilter2Th4);
 
         int L1_SingleEG5_BptxAND        = 0;
         int L1_SingleEG7_BptxAND        = 0;
@@ -832,9 +859,9 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
                 h_lead_pho_ECALIso[ieta][icent] = new TH1D(Form("h_lead_pho_ECALIso_%zu_%zu",ieta,icent),Form("h_lead_pho_ECALIso_%zu_%zu;Leading #gamma ECAL Cluster IsoR3;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_HCALIso[ieta][icent] = new TH1D(Form("h_lead_pho_HCALIso_%zu_%zu",ieta,icent),Form("h_lead_pho_HCALIso_%zu_%zu;Leading #gamma HCAL Rechit IsoR3;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_TRKIso[ieta][icent] = new TH1D(Form("h_lead_pho_TRKIso_%zu_%zu",ieta,icent),Form("h_lead_pho_TRKIso_%zu_%zu;Leading #gamma trackIsoR3PtCut20;Norm. Events",ieta,icent),iso_bins, isolation_edges);
-                h_lead_pho_PFPIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFPIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFPIso_%zu_%zu;Leading #gamma pfpIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
-                h_lead_pho_PFNIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFNIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFNIso_%zu_%zu;Leading #gamma pfnIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
-                h_lead_pho_PFCIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFCIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFCIso_%zu_%zu;Leading #gamma pfcIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
+                h_lead_pho_PFPIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFPIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFPIso_%zu_%zu;Leading #gamma pfpIso3subUEec;Norm. Events",ieta,icent),iso_bins, isolation_edges);
+                h_lead_pho_PFNIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFNIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFNIso_%zu_%zu;Leading #gamma pfnIso3subUEec;Norm. Events",ieta,icent),iso_bins, isolation_edges);
+                h_lead_pho_PFCIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFCIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFCIso_%zu_%zu;Leading #gamma pfcIso3subUEec;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_R9[ieta][icent] = new TH1D(Form("h_lead_pho_R9_%zu_%zu",ieta,icent),Form("h_lead_pho_R9_%zu_%zu;Leading #gamma R9;Norm. Events",ieta,icent),40,0,1.1);
 
                 h_lead_ele_Pt[ieta][icent] = new TH1D(Form("h_lead_ele_Pt_%zu_%zu",ieta,icent),Form("h_lead_ele_Pt_%zu_%zu;Leading Electron p_{T} (GeV);Norm. Events",ieta,icent),net_bins,et_edges); // 30,0,150
@@ -873,6 +900,7 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
         HiTree.GetEntry(iEntry);
         photonTree.GetEntry(iEntry);
         hltanalysis.GetEntry(iEntry);
+        skimanalysis.GetEntry(iEntry);
         // std::cout<<"Inside event loop = "<<iEntry;
         // printf("\n");
         float scale = 1;
@@ -887,9 +915,10 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
         // if(pphfCoincFilter2Th4)
         // std::cout<<"Event = "<<iEntry<<"    photon = "<<phoEt->size()<<"\t pphfCoincFilter2Th4 ="<<pphfCoincFilter2Th4<<"\n";
 
-        // if(isData && pprimaryVertexFilter<=0) continue;
-        // if(isData && pclusterCompatibilityFilter<=0) continue;
-        // if(isData && pphfCoincFilter2Th4<=0) continue;
+        if(isData && pprimaryVertexFilter<=0 && !in_label.Contains("Express")) continue;
+        if(isData && pclusterCompatibilityFilter<=0 && !in_label.Contains("Express")) continue;
+        if(isData && pphfCoincFilter2Th4<=0 && !in_label.Contains("Express")) continue;
+        if(isData && hiHF>6000) continue;
         
         // Leading Photon
         for(int ipho=0; ipho<phoEt->size(); ipho++){
@@ -940,9 +969,9 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
                     // if(!(isolation<5)) continue;
 
                     // Loose Photon ID
-                    if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
-                    if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
-                    if(!(isolation<11.697505)) continue;
+                    // if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
+                    // if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
+                    // if(!(isolation<11.697505)) continue;
 
                     h_lead_pho_et[ieta][icent]->Fill(         phoEt->at(pho_index), scale);
                     h_lead_pho_eta[ieta][icent]->Fill(        phoSCEta->at(pho_index), scale);
@@ -953,9 +982,9 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
                     h_lead_pho_ECALIso[ieta][icent]->Fill(    pho_ecalClusterIsoR3->at(pho_index), scale);
                     h_lead_pho_HCALIso[ieta][icent]->Fill(    pho_hcalRechitIsoR3->at(pho_index), scale);
                     h_lead_pho_TRKIso[ieta][icent]->Fill(     pho_trackIsoR3PtCut20->at(pho_index), scale);
-                    h_lead_pho_PFPIso[ieta][icent]->Fill(     pfpIso3subUE->at(pho_index), scale);
-                    h_lead_pho_PFNIso[ieta][icent]->Fill(     pfnIso3subUE->at(pho_index), scale);
-                    h_lead_pho_PFCIso[ieta][icent]->Fill(     pfcIso3subUE->at(pho_index), scale);
+                    h_lead_pho_PFPIso[ieta][icent]->Fill(     pfpIso3subUEec->at(pho_index), scale);
+                    h_lead_pho_PFNIso[ieta][icent]->Fill(     pfnIso3subUEec->at(pho_index), scale);
+                    h_lead_pho_PFCIso[ieta][icent]->Fill(     pfcIso3subUEec->at(pho_index), scale);
                     h_lead_pho_R9[ieta][icent]->Fill(         phoR9_2012->at(pho_index), scale);
                 }
             }
@@ -1030,10 +1059,10 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
 
                     if(elePt->at(lead_ele_index)<20) continue;
                     Bool_t flagLooseEle = false;
-                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
-                        if(eleMissHits->at(lead_ele_index)>1) continue;
-                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
-                    }
+                    // if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                    //     if(eleMissHits->at(lead_ele_index)>1) continue;
+                    //     if(eleIP3D->at(lead_ele_index)>=0.03) continue;
+                    // }
                     // Electron Veto ID
                     if((hiBin)>=0 && (hiBin)<60){
                         if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0147) continue;
@@ -1052,7 +1081,7 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
                         flagLooseEle=true;
                     }
 
-                    if(!flagLooseEle) continue;
+                    // if(!flagLooseEle) continue;
 
                     h_lead_ele_Pt[ieta][icent]->Fill(                elePt->at(lead_ele_index) ,scale);
                     h_lead_ele_eta[ieta][icent]->Fill(               eleEta->at(lead_ele_index) ,scale);
@@ -1087,10 +1116,10 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
 
                     if(elePt->at(sublead_ele_index)<20) continue;
                     Bool_t flagLooseEle = false;
-                    if(fabs(eleEta->at(sublead_ele_index))<1.442) {
-                        if(eleMissHits->at(sublead_ele_index)>1) continue;
-                        if(eleIP3D->at(sublead_ele_index)>=0.03) continue;
-                    }
+                    // if(fabs(eleEta->at(sublead_ele_index))<1.442) {
+                    //     if(eleMissHits->at(sublead_ele_index)>1) continue;
+                    //     if(eleIP3D->at(sublead_ele_index)>=0.03) continue;
+                    // }
                     // Electron Veto ID
                     if((hiBin)>=0 && (hiBin)<60){
                         if(eleSigmaIEtaIEta_2012->at(sublead_ele_index)>=0.0147) continue;
@@ -1124,7 +1153,7 @@ void Data_fill_pho_ele(std::vector<TString> in_file_path,TString in_label, Bool_
 
     } // End event loop
 
-    std::cout<<"\nNumber of selected events = "<<h_lead_pho_et[0][0]->GetEntries()<<"\n";
+    std::cout<<"\nNumber of selected photons = "<<h_lead_pho_et[0][0]->GetEntries()<<"\n";
 
     if(h_lead_pho_et[0][0]->GetEntries()==0){ std::cout<<"Return from function 0 entries => Not writing to file\n"; return;}
     
@@ -1582,7 +1611,7 @@ void overlay_runs(std::vector<TH1D*> hist,std::vector<TString> histname,TString 
     if(opt.Contains("log")) gStyle->SetOptLogy(0);
 }
 
-void Plot_hist(std::vector<TH1F*> hist,std::vector<TString> histname,TString opt,std::vector<TString> eopt){
+void Plot_hist(std::vector<TH1D*> hist,std::vector<TString> histname,TString opt,std::vector<TString> eopt){
     // opt contains options
     // "eff" = Efficiency Plot. Divide by 0th index
     // "left","right", "bcenter" = Legend location 
@@ -1678,7 +1707,7 @@ void Plot_hist(std::vector<TH1F*> hist,std::vector<TString> histname,TString opt
 
     TLatex latex;
     latex.SetTextSize(0.035);
-    latex.DrawLatexNDC(0.12,0.92,"CMS #it{#bf{Run 3 ECAL Study}} "+label);
+    latex.DrawLatexNDC(0.12,0.92,"CMS #it{#bf{Internal}} Data Validation "+label);
 
     if(eopt[0].Contains("Cent")){
         latex.DrawLatexNDC(0.78,0.92,eopt[0]);
