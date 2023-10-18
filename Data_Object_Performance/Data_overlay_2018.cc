@@ -24,14 +24,15 @@
 
 using namespace std;
 
-TString label="Run_374719_374810";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
-TString Tag = "_PromptReco_2023_10_11";
+TString label="PromptReco";//"2023_Run3_QCDPhoton_Embedded";//"2023_Run3_EmEnrichedDijet30_Embedded"; // "HiMinimumBias2_Data_2018";
+TString Tag = "_noSel_2023_10_17";
 TString output_path = "./";
 TFile *fout_2018, *fout_2023, *fout_temp;
 // TCanvas c;
 
-bool flag_2018=false;    // To run over 2018 Data
-bool flag_MC=false;      // To run over 2023 MC
+bool flag_2018=true;    // To run over 2018 Data
+bool flag_MC=true;      // To run over 2023 MC
+bool flag_2023=true;      // To run over 2023 MC
 bool flag_plot=true;    // To plot resulting histograms 
 bool flag_ratio=true;   // To plot the ratios. If false only the distributions are shown
 
@@ -73,7 +74,7 @@ void Data_overlay_2018(){
     
     gSystem->Exec(mkDIR);
 
-    int nfiles = 9999; // Can reduce to test if the script runs
+    int nfiles = 2000; // Can reduce to test if the script runs
     std::vector<TString> files;
     
     if(flag_2018){
@@ -82,10 +83,10 @@ void Data_overlay_2018(){
 
         files.clear();
         TString input_dir_2018  = "/data_CMS/cms/bharikri/2018_Data_EGM_Validation/";
-        GetFiles(input_dir_2018.Data(), files,nfiles>100?100:nfiles);
+        GetFiles(input_dir_2018.Data(), files,nfiles>500?500:nfiles);
         std::cout<<"Got "<<files.size()<<" files for 2018 Data \n";
         Data_fill_pho_ele_2018(files,"2018_Data",true);
-        std::cout<<Form("Output_2018Data_%s%s.root",label.Data(),Tag.Data())<<" file created\n";
+        std::cout<<Form("Output_2018Data_%s.root",Tag.Data())<<" file created\n";
         fout_2018->Close();
         delete fout_2018;
     }
@@ -97,42 +98,53 @@ void Data_overlay_2018(){
         files.clear();
         TString input_dir_MC  = "/data_CMS/cms/bharikri/ECAL_study/old/QCDPhoton_30/Run3_Reference/";
         GetFiles(input_dir_MC.Data(), files,nfiles);
-        std::cout<<"Got "<<files.size()<<" files for MC \n";
+        std::cout<<"Got "<<files.size()<<" files for QCDPhoton_MC_ppNom \n";
         Data_fill_pho_ele_2023(files,"QCDPhoton_MC_ppNom",false);
+        std::cout<<Form("Output_%s%s.root",label.Data(),Tag.Data())<<" file created\n";
+        fout_2023->Close();
+        delete fout_2023;
+
+        fout_2023 = new TFile(DIR+"/Output_"+label+Tag+".root", "UPDATE");
+        fout_2023->cd();
+
+        files.clear();
+        input_dir_MC  = "/data_CMS/cms/bharikri/ECAL_study/old/EmEnrichedDijet_30/Run3_Reference/";
+        GetFiles(input_dir_MC.Data(), files,nfiles);
+        std::cout<<"Got "<<files.size()<<" files for EmEnrichedDijet_MC_ppNom \n";
+        Data_fill_pho_ele_2023(files,"EmEnrichedDijet_MC_ppNom",false);
         std::cout<<Form("Output_%s%s.root",label.Data(),Tag.Data())<<" file created\n";
         fout_2023->Close();
         delete fout_2023;
     }
 
+    if(flag_2023){
+
+        fout_2023 = new TFile(DIR+"/Output_"+label+Tag+".root", "UPDATE");
+        fout_2023->cd();
+
+        files.clear();
+        TString input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/bharikri/run3RapidValidation/ValidationForest_13_2_5_patch3_EGM_HLT_30_HIPhysicsRawPrime_Run_374668_375064_2023-10-17/";
+        GetFiles(input_dir_promptreco.Data(), files,nfiles);
+
+        std::cout<<"Got "<<files.size()<<" files for 2023_Oct_17_PromptHIPhysicsRawPrime\n";
+        Data_fill_pho_ele_2023(files,"2023_Oct_17_PromptHIPhysicsRawPrime",true);
+        std::cout<<"Output_"<<label<<Tag<<".root file created\n";
+        fout_2023->Close();
+        delete fout_2023;
+    }
+
     fout_2023 = new TFile(DIR+"/Output_"+label+Tag+".root", "UPDATE");
-    fout_2023->cd();
 
-    files.clear();
-    TString input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374719_HIPhysicsRawPrime2_2023-10-06/0000/";
-    GetFiles(input_dir_promptreco.Data(), files,nfiles);
-    input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374719_HIPhysicsRawPrime1_2023-10-06/0000/";
-    GetFiles(input_dir_promptreco.Data(), files,nfiles);
-    input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/jviinika/run3RapidValidation/PbPb2023_run374719_HIPhysicsRawPrime0_2023-10-06/0000/";
-    GetFiles(input_dir_promptreco.Data(), files,nfiles);
-
-    input_dir_promptreco  = "/eos/cms/store/group/phys_heavyions/mstojano/run3RapidValidation/PbPb2023_run374810_HIPhysicsRawPrime0_Forest_2023-10-09/CRAB_UserFiles/crab_PbPb2023_run374810_HIPhysicsRawPrime0_Forest_2023-10-09/231009_162633/";
-    GetFiles(input_dir_promptreco.Data(), files,nfiles);
-
-    std::cout<<"Got "<<files.size()<<" files for run374719_374810_PromptHIPhysicsRawPrime\n";
-    Data_fill_pho_ele_2023(files,"run374719_374810_PromptHIPhysicsRawPrime",true);
-    std::cout<<"Output_"<<label<<Tag<<".root file created\n";
-    fout_2023->Close();
-    // delete fout_2023;
-
-    fout_2023 = TFile::Open(DIR+"/Output_"+label+Tag+".root", "UPDATE");
+    if(!fout_2023){std::cout<<"File with 2023 MC/Data doesn't exist\n"; return;}
 
     // Overlay
     if(flag_plot){
 
         std::vector<std::vector<TString>>dirlist_name = {
-            {DIR+"/Output_"+label+Tag+".root","run374719_374810_PromptHIPhysicsRawPrime","Physics Private Reco"},
+            {DIR+"/Output_"+label+Tag+".root","2023_Oct_17_PromptHIPhysicsRawPrime","Physics Full Prompt Reco"},
             {DIR+"/Output_2018Data"+Tag+".root","2018_Data","2018 Data"},
-            // {DIR+"/Output_"+label+Tag+".root","QCDPhoton_MC_ppNom","2023 QCDPhoton MC-old ECAL"},
+            {DIR+"/Output_"+label+Tag+".root","QCDPhoton_MC_ppNom","2023 QCDPhoton MC-old ECAL"},
+            {DIR+"/Output_"+label+Tag+".root","EmEnrichedDijet_MC_ppNom","2023 EmEnrichedDijet MC-old ECAL"},
         };
 
         std::vector<TString>histlist = {
@@ -150,6 +162,17 @@ void Data_overlay_2018(){
             "h_lead_pho_PFCIso",
             "h_lead_pho_R9",
 
+            "h_lead_pho_SCRawE",
+            "h_lead_pho_SCEtaWidth",
+            "h_lead_pho_SCPhiWidth",
+            "h_lead_pho_E3x3_2012",
+            "h_lead_pho_MaxEnergyXtal_2012",
+            "h_lead_pho_E2nd_2012",
+            "h_lead_pho_E_LR",
+            "h_lead_pho_E_TB",
+            "h_lead_pho_SigmaIEtaIPhi_2012",
+            "h_lead_pho_SigmaIPhiIPhi_2012",
+
             "h_lead_ele_Pt",
             "h_lead_ele_eta",
             "h_lead_ele_SIEIE",
@@ -160,23 +183,27 @@ void Data_overlay_2018(){
             "h_lead_ele_dPhiAtVtx",
             "h_lead_ele_EoverPInv",
 
-            "h_sublead_ele_Pt",
-            "h_sublead_ele_eta",
-            "h_sublead_ele_SIEIE",
-            "h_sublead_ele_phi",
-            "h_sublead_ele_HoverE",
-            "h_sublead_ele_EoverP",
-            "h_sublead_ele_dEtaSeedAtVtx",
-            "h_sublead_ele_dPhiAtVtx",
-            "h_sublead_ele_EoverPInv",
+            "h_lead_ele_R9",
+            "h_lead_ele_IP3D",
+            "h_lead_ele_NormChi2",
+
+            // "h_sublead_ele_Pt",
+            // "h_sublead_ele_eta",
+            // "h_sublead_ele_SIEIE",
+            // "h_sublead_ele_phi",
+            // "h_sublead_ele_HoverE",
+            // "h_sublead_ele_EoverP",
+            // "h_sublead_ele_dEtaSeedAtVtx",
+            // "h_sublead_ele_dPhiAtVtx",
+            // "h_sublead_ele_EoverPInv",
         };
 
-        for (std::size_t icent = 0; icent <= 0; ++icent){ // ncent {0-100, 0-30, 30-100} 
+        for (std::size_t icent = 0; icent <= 2; ++icent){ // ncent {0-100, 0-30, 30-100} 
        
             for (std::size_t ieta = 0; ieta <=2; ++ieta){ //neta   {|eta|<1.44, 1.566<|eta|<2.1, 0<|eta|<2.4} 
                 int temp_hist_index = 1;
 
-                std::vector<TString>sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>40 + HLT40","Loose ID"}; // ,"NOT GEN MATCHED"
+                std::vector<TString>sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>40 + HLT40","No selections"}; // ,"NOT GEN MATCHED"
 
                 for(TString input_hist:histlist){
                     TString outplotname = input_hist;   
@@ -350,7 +377,8 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
         std::vector<float>* eleIP3D = 0;
         std::vector<float>* eleEn = 0;
 
-        photonTree.LoadTree(0);
+        std::vector<float>* eleTrkNormalizedChi2 = 0;
+        std::vector<float>* eleR9Full5x5 = 0;
 
         if(photonTree.GetBranch("mcPID") && !isData){
 
@@ -428,6 +456,11 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
         photonTree.SetBranchAddress("eleCharge",               &eleCharge);
         photonTree.SetBranchAddress("eleIP3D",                 &eleIP3D);
         photonTree.SetBranchAddress("eleEn",                   &eleEn);
+        
+        photonTree.SetBranchAddress("eleTrkNormalizedChi2",    &eleTrkNormalizedChi2);
+        photonTree.SetBranchAddress("eleR9Full5x5",            &eleR9Full5x5);
+
+        photonTree.LoadTree(0);
 
         int pprimaryVertexFilter = 1;               // Pass if it doesn't exist in the Forest
         int pclusterCompatibilityFilter = 1;
@@ -489,6 +522,17 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
         TH1D* h_lead_pho_PFCIso[neta][ncent];
         TH1D* h_lead_pho_R9[neta][ncent];
 
+        TH1D* h_lead_pho_SCRawE[neta][ncent];
+        TH1D* h_lead_pho_SCEtaWidth[neta][ncent];
+        TH1D* h_lead_pho_SCPhiWidth[neta][ncent];
+        TH1D* h_lead_pho_E3x3_2012[neta][ncent];
+        TH1D* h_lead_pho_MaxEnergyXtal_2012[neta][ncent];
+        TH1D* h_lead_pho_E2nd_2012[neta][ncent];
+        TH1D* h_lead_pho_E_LR[neta][ncent];
+        TH1D* h_lead_pho_E_TB[neta][ncent];
+        TH1D* h_lead_pho_SigmaIEtaIPhi_2012[neta][ncent];
+        TH1D* h_lead_pho_SigmaIPhiIPhi_2012[neta][ncent];
+
         TH1D* h_lead_ele_Pt[neta][ncent];
         TH1D* h_lead_ele_eta[neta][ncent];
         TH1D* h_lead_ele_SIEIE[neta][ncent];
@@ -498,6 +542,10 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
         TH1D* h_lead_ele_dEtaSeedAtVtx[neta][ncent];
         TH1D* h_lead_ele_dPhiAtVtx[neta][ncent];
         TH1D* h_lead_ele_EoverPInv[neta][ncent];
+
+        TH1D* h_lead_ele_R9[neta][ncent];
+        TH1D* h_lead_ele_IP3D[neta][ncent];
+        TH1D* h_lead_ele_NormChi2[neta][ncent];
 
         TH1D* h_sublead_ele_Pt[neta][ncent];
         TH1D* h_sublead_ele_eta[neta][ncent];
@@ -509,10 +557,10 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
         TH1D* h_sublead_ele_dPhiAtVtx[neta][ncent];
         TH1D* h_sublead_ele_EoverPInv[neta][ncent];
 
-        // TH1D* h_ele_Zmass[neta][ncent];    
+        // TH1D* h_ele_Zmass[neta][ncent];   
 
-        const Int_t net_bins = 9;
-        Double_t et_edges[net_bins+1] = {20.0, 25, 30, 35, 40, 45, 50, 60, 80, 120}; 
+        const Int_t net_bins = 13;
+        Double_t et_edges[net_bins+1] = {20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 120, 150, 200}; 
 
         const Int_t iso_bins = 12;
         Double_t isolation_edges[iso_bins+1] = {-20,-10,-5,-3,-2,-1,1,2,3,5,10,15,30};
@@ -544,17 +592,33 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                 h_lead_pho_PFPIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFPIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFPIso_%zu_%zu;Leading #gamma pfpIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_PFNIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFNIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFNIso_%zu_%zu;Leading #gamma pfnIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_PFCIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFCIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFCIso_%zu_%zu;Leading #gamma pfcIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
-                h_lead_pho_R9[ieta][icent] = new TH1D(Form("h_lead_pho_R9_%zu_%zu",ieta,icent),Form("h_lead_pho_R9_%zu_%zu;Leading #gamma R9;Norm. Events",ieta,icent),40,0,1.1);
+                h_lead_pho_R9[ieta][icent] = new TH1D(Form("h_lead_pho_R9_%zu_%zu",ieta,icent),Form("h_lead_pho_R9_%zu_%zu;Leading #gamma R_{9};Norm. Events",ieta,icent),40,0,1.1);
+                
+                h_lead_pho_SCRawE[ieta][icent] = new TH1D(Form("h_lead_pho_SCRawE_%zu_%zu",ieta,icent),Form("h_lead_pho_SCRawE_%zu_%zu;Leading #gamma SCRawE;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_SCEtaWidth[ieta][icent] = new TH1D(Form("h_lead_pho_SCEtaWidth_%zu_%zu",ieta,icent),Form("h_lead_pho_SCEtaWidth_%zu_%zu;Leading #gamma SCEtaWidth;Norm. Events",ieta,icent),40,0,0.05);
+                h_lead_pho_SCPhiWidth[ieta][icent] = new TH1D(Form("h_lead_pho_SCPhiWidth_%zu_%zu",ieta,icent),Form("h_lead_pho_SCPhiWidth_%zu_%zu;Leading #gamma SCPhiWidth;Norm. Events",ieta,icent),40,0,0.1);
+                h_lead_pho_E3x3_2012[ieta][icent] = new TH1D(Form("h_lead_pho_E3x3_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_E3x3_2012_%zu_%zu;Leading #gamma E3x3_2012;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_MaxEnergyXtal_2012[ieta][icent] = new TH1D(Form("h_lead_pho_MaxEnergyXtal_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_MaxEnergyXtal_2012_%zu_%zu;Leading #gamma MaxEnergyXtal_2012;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_E2nd_2012[ieta][icent] = new TH1D(Form("h_lead_pho_E2nd_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_E2nd_2012_%zu_%zu;Leading #gamma E2nd_2012;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_E_LR[ieta][icent] = new TH1D(Form("h_lead_pho_E_LR_%zu_%zu",ieta,icent),Form("h_lead_pho_E_LR_%zu_%zu;Leading #gamma E_LR;Norm. Events",ieta,icent),40,0,0.1);
+                h_lead_pho_E_TB[ieta][icent] = new TH1D(Form("h_lead_pho_E_TB_%zu_%zu",ieta,icent),Form("h_lead_pho_E_TB_%zu_%zu;Leading #gamma E_TB;Norm. Events",ieta,icent),40,0,0.1);
+                h_lead_pho_SigmaIEtaIPhi_2012[ieta][icent] = new TH1D(Form("h_lead_pho_SigmaIEtaIPhi_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_SigmaIEtaIPhi_2012_%zu_%zu;Leading #gamma SigmaIEtaIPhi_2012;Norm. Events",ieta,icent),40,-0.001,0.001);
+                h_lead_pho_SigmaIPhiIPhi_2012[ieta][icent] = new TH1D(Form("h_lead_pho_SigmaIPhiIPhi_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_SigmaIPhiIPhi_2012_%zu_%zu;Leading #gamma SigmaIPhiIPhi_2012;Norm. Events",ieta,icent),40,0,0.1);
+                
 
                 h_lead_ele_Pt[ieta][icent] = new TH1D(Form("h_lead_ele_Pt_%zu_%zu",ieta,icent),Form("h_lead_ele_Pt_%zu_%zu;Leading Electron p_{T} (GeV);Norm. Events",ieta,icent),net_bins,et_edges); // 30,0,150
                 h_lead_ele_eta[ieta][icent] = new TH1D(Form("h_lead_ele_eta_%zu_%zu",ieta,icent),Form("h_lead_ele_eta_%zu_%zu;Leading Electron SC #eta;Norm. Events",ieta,icent),10,-2.4,2.4);
                 h_lead_ele_phi[ieta][icent] = new TH1D(Form("h_lead_ele_phi_%zu_%zu",ieta,icent),Form("h_lead_ele_phi_%zu_%zu;Leading Electron SC #phi;Norm. Events",ieta,icent),10,-3.14,3.14);
                 h_lead_ele_HoverE[ieta][icent] = new TH1D(Form("h_lead_ele_HoverE_%zu_%zu",ieta,icent),Form("h_lead_ele_HoverE_%zu_%zu;Leading Electron H/E;Norm. Events",ieta,icent),20,0,0.1);
-                h_lead_ele_SIEIE[ieta][icent] = new TH1D(Form("h_lead_ele_SIEIE_%zu_%zu",ieta,icent),Form("h_lead_ele_SIEIE_%zu_%zu;Leading Electron #sigma_{#eta #eta};Norm. Events",ieta,icent),30,0,0.1);
+                h_lead_ele_SIEIE[ieta][icent] = new TH1D(Form("h_lead_ele_SIEIE_%zu_%zu",ieta,icent),Form("h_lead_ele_SIEIE_%zu_%zu;Leading Electron #sigma_{#eta #eta};Norm. Events",ieta,icent),30,0,0.02);
                 h_lead_ele_EoverP[ieta][icent] = new TH1D(Form("h_lead_ele_EoverP_%zu_%zu",ieta,icent),Form("h_lead_ele_EoverP_%zu_%zu;Leading Electron E/P;Norm. Events",ieta,icent),20,0,20);
                 h_lead_ele_dEtaSeedAtVtx[ieta][icent] = new TH1D(Form("h_lead_ele_dEtaSeedAtVtx_%zu_%zu",ieta,icent),Form("h_lead_ele_dEtaSeedAtVtx_%zu_%zu;Leading Electron #Delta #eta_{seed, Track};Norm. Events",ieta,icent),20,-0.02,0.02);
                 h_lead_ele_dPhiAtVtx[ieta][icent] = new TH1D(Form("h_lead_ele_dPhiAtVtx_%zu_%zu",ieta,icent),Form("h_lead_ele_dPhiAtVtx_%zu_%zu;Leading Electron #Delta #phi_{SC, Track};Norm. Events",ieta,icent),20,-0.2,0.2);
                 h_lead_ele_EoverPInv[ieta][icent] = new TH1D(Form("h_lead_ele_EoverPInv_%zu_%zu",ieta,icent),Form("h_lead_ele_EoverPInv_%zu_%zu;Leading Electron EoverPInv;Norm. Events",ieta,icent),20,-0.2,0.2);
+
+                h_lead_ele_R9[ieta][icent] = new TH1D(Form("h_lead_ele_R9_%zu_%zu",ieta,icent),Form("h_lead_ele_R9_%zu_%zu;Leading Electron R_{9};Norm. Events",ieta,icent),30,0,1.1);
+                h_lead_ele_IP3D[ieta][icent] = new TH1D(Form("h_lead_ele_IP3D_%zu_%zu",ieta,icent),Form("h_lead_ele_IP3D_%zu_%zu;Leading Electron IP3D;Norm. Events",ieta,icent),20,0,1);
+                h_lead_ele_NormChi2[ieta][icent] = new TH1D(Form("h_lead_ele_NormChi2_%zu_%zu",ieta,icent),Form("h_lead_ele_NormChi2_%zu_%zu;Leading Electron Norm #Chi^{2};Norm. Events",ieta,icent),40,0,40);
 
                 h_sublead_ele_Pt[ieta][icent] = new TH1D(Form("h_sublead_ele_Pt_%zu_%zu",ieta,icent),Form("h_sublead_ele_Pt_%zu_%zu;Sub-Leading Electron p_{T} (GeV);Norm. Events",ieta,icent),net_bins,et_edges); // 30,0,150
                 h_sublead_ele_eta[ieta][icent] = new TH1D(Form("h_sublead_ele_eta_%zu_%zu",ieta,icent),Form("h_sublead_ele_eta_%zu_%zu;Sub-Leading Electron SC #eta;Norm. Events",ieta,icent),10,-2.4,2.4);
@@ -585,7 +649,7 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
         // std::cout<<"Inside event loop = "<<iEntry;
         // printf("\n");
         float scale = 1;
-        if(!isData) scale*=weight*Ncoll[hiBin];
+        if(!isData) scale*=weight;//*Ncoll[hiBin];
 
         int pho_index=-1;
         float Etmax=-1;
@@ -631,6 +695,8 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     if(phoSigmaEtaEta_2012->at(pho_index)<=0.002) continue;        // Spike Cuts
                     if(fabs(pho_seedTime->at(pho_index))>=3 || pho_swissCrx->at(pho_index)>=0.9) continue;
 
+                    if(phoSCEta->at(pho_index)<-1.39 && phoSCPhi->at(pho_index)<-0.9 && phoSCPhi->at(pho_index)>-1.6) continue;
+
                     // if(!(HLT_HIGEDPhoton20_v1 || HLT_HIGEDPhoton30_v1 || HLT_HIGEDPhoton40_v1)) continue;
                     if(!(HLT_HIGEDPhoton40_v1)) continue;
 
@@ -639,9 +705,9 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     // if(!(isolation<5)) continue;
 
                     // Loose Photon ID
-                    if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
-                    if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
-                    if(!(isolation<11.697505)) continue;
+                    // if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
+                    // if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
+                    // if(!(isolation<11.697505)) continue;
 
                     h_lead_pho_et[ieta][icent]->Fill(         phoEt->at(pho_index), scale);
                     h_lead_pho_eta[ieta][icent]->Fill(        phoSCEta->at(pho_index), scale);
@@ -656,6 +722,17 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     h_lead_pho_PFNIso[ieta][icent]->Fill(     pfnIso3subUE->at(pho_index), scale);
                     h_lead_pho_PFCIso[ieta][icent]->Fill(     pfcIso3subUE->at(pho_index), scale);
                     h_lead_pho_R9[ieta][icent]->Fill(         phoR9_2012->at(pho_index), scale);
+
+                    h_lead_pho_SCRawE[ieta][icent]->Fill(                phoSCRawE->at(pho_index),scale);
+                    h_lead_pho_SCEtaWidth[ieta][icent]->Fill(            phoSCEtaWidth->at(pho_index),scale);
+                    h_lead_pho_SCPhiWidth[ieta][icent]->Fill(            phoSCPhiWidth->at(pho_index),scale);
+                    h_lead_pho_E3x3_2012[ieta][icent]->Fill(             phoE3x3_2012->at(pho_index),scale);
+                    h_lead_pho_MaxEnergyXtal_2012[ieta][icent]->Fill(    phoMaxEnergyXtal_2012->at(pho_index),scale);
+                    h_lead_pho_E2nd_2012[ieta][icent]->Fill(             phoE2nd_2012->at(pho_index),scale);
+                    h_lead_pho_E_LR[ieta][icent]->Fill(                  fabs(phoELeft_2012->at(pho_index)-phoERight_2012->at(pho_index))/(phoELeft_2012->at(pho_index)+phoERight_2012->at(pho_index)),scale);
+                    h_lead_pho_E_TB[ieta][icent]->Fill(                  fabs(phoEBottom_2012->at(pho_index)-phoETop_2012->at(pho_index))/(phoEBottom_2012->at(pho_index)+phoETop_2012->at(pho_index)),scale);
+                    h_lead_pho_SigmaIEtaIPhi_2012[ieta][icent]->Fill(    phoSigmaIEtaIPhi_2012->at(pho_index),scale);
+                    h_lead_pho_SigmaIPhiIPhi_2012[ieta][icent]->Fill(    phoSigmaIPhiIPhi_2012->at(pho_index),scale);
                 }
             }
         }
@@ -715,13 +792,14 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
 
                     // if(!(HLT_HIEle20Gsf_v1 || HLT_HIEle30Gsf_v1 || HLT_HIEle40Gsf_v1 || HLT_HIEle50Gsf_v1)) continue;
                     if(!(HLT_HIEle40Gsf_v1)) continue;
+                    if(eleEta->at(lead_ele_index)<-1.39 && elePhi->at(lead_ele_index)<-0.9 && elePhi->at(lead_ele_index)>-1.6) continue;
 
                     if(elePt->at(lead_ele_index)<40) continue;
                     Bool_t flagLooseEle = false;
-                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
-                        if(eleMissHits->at(lead_ele_index)>1) continue;
-                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
-                    }
+                    // if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                    //     if(eleMissHits->at(lead_ele_index)>1) continue;
+                    //     if(eleIP3D->at(lead_ele_index)>=0.03) continue;
+                    // }
                     // Electron Veto ID
                     if((hiBin)>=0 && (hiBin)<60){
                         if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0147) continue;
@@ -740,7 +818,7 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                         flagLooseEle=true;
                     }
 
-                    if(!flagLooseEle) continue;
+                    // if(!flagLooseEle) continue;
 
                     h_lead_ele_Pt[ieta][icent]->Fill(                elePt->at(lead_ele_index) ,scale);
                     h_lead_ele_eta[ieta][icent]->Fill(               eleEta->at(lead_ele_index) ,scale);
@@ -751,7 +829,11 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     h_lead_ele_dEtaSeedAtVtx[ieta][icent]->Fill(     eledEtaSeedAtVtx->at(lead_ele_index) ,scale);
                     h_lead_ele_dPhiAtVtx[ieta][icent]->Fill(         eledPhiAtVtx->at(lead_ele_index) ,scale);
                     h_lead_ele_EoverPInv[ieta][icent]->Fill(         eleEoverPInv->at(lead_ele_index) ,scale);
-                    
+
+                    h_lead_ele_R9[ieta][icent]->Fill(                eleR9Full5x5->at(lead_ele_index) ,scale);
+                    h_lead_ele_IP3D[ieta][icent]->Fill(              eleIP3D->at(lead_ele_index) ,scale);
+                    h_lead_ele_NormChi2[ieta][icent]->Fill(          eleTrkNormalizedChi2->at(lead_ele_index) ,scale);
+                                     
                 }
             }
         }
@@ -764,6 +846,8 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     if(!(hiBin>=min_cent[icent] && hiBin<max_cent[icent])) continue; 
                     
                     if(!(HLT_HIEle15Ele10Gsf_v1 || HLT_HIEle15Ele10GsfMass50_v1 || HLT_HIDoubleEle10Gsf_v1 || HLT_HIDoubleEle10GsfMass50_v1 || HLT_HIDoubleEle15Gsf_v1 || HLT_HIDoubleEle15GsfMass50_v1)) continue;
+
+                    if(eleEta->at(sublead_ele_index)<-1.39 && elePhi->at(sublead_ele_index)<-0.9 && elePhi->at(sublead_ele_index)>-1.6) continue;
 
                     if(elePt->at(sublead_ele_index)<20) continue;
                     Bool_t flagLooseEle = false;
@@ -806,7 +890,8 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
 
     } // End event loop
 
-    std::cout<<"\nNumber of selected photons = "<<h_lead_pho_et[0][0]->GetEntries()<<"\n";
+    std::cout<<"\nNumber of selected photons in 0,0 = "<<h_lead_pho_et[0][0]->GetEntries()<<"\n";
+    std::cout<<"Number of selected electrons in 0,0 = "<<h_lead_ele_Pt[0][0]->GetEntries()<<"\n\n";
 
     if(h_lead_pho_et[0][0]->GetEntries()==0){ std::cout<<"Return from function 0 entries => Not writing to file\n"; return;}
     
@@ -832,6 +917,17 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
             h_lead_pho_PFCIso[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_pho_R9[ieta][icent]->Write("",TObject::kOverwrite);
 
+            h_lead_pho_SCRawE[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SCEtaWidth[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SCPhiWidth[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E3x3_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_MaxEnergyXtal_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E2nd_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E_LR[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E_TB[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SigmaIEtaIPhi_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SigmaIPhiIPhi_2012[ieta][icent]->Write("",TObject::kOverwrite);
+        
             h_lead_ele_Pt[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_eta[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_SIEIE[ieta][icent]->Write("",TObject::kOverwrite);
@@ -841,6 +937,10 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
             h_lead_ele_dEtaSeedAtVtx[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_dPhiAtVtx[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_EoverPInv[ieta][icent]->Write("",TObject::kOverwrite);
+
+            h_lead_ele_R9[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_ele_IP3D[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_ele_NormChi2[ieta][icent]->Write("",TObject::kOverwrite);
 
             h_sublead_ele_Pt[ieta][icent]->Write("",TObject::kOverwrite);
             h_sublead_ele_eta[ieta][icent]->Write("",TObject::kOverwrite);
@@ -967,6 +1067,9 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
         std::vector<float>* eleIP3D = 0;
         std::vector<float>* eleEn = 0;
 
+        std::vector<float>* eleTrkNormalizedChi2 = 0;
+        std::vector<float>* eleR9Full5x5 = 0;
+
         if(photonTree.GetBranch("mcPID") && !isData){
 
             photonTree.SetBranchAddress("mcStatus",     &mcStatus);
@@ -1044,6 +1147,11 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
         photonTree.SetBranchAddress("eleIP3D",                 &eleIP3D);
         photonTree.SetBranchAddress("eleEn",                   &eleEn);
 
+        photonTree.SetBranchAddress("eleTrkNormalizedChi2",    &eleTrkNormalizedChi2);
+        photonTree.SetBranchAddress("eleR9Full5x5",            &eleR9Full5x5);
+
+        photonTree.LoadTree(0);
+
         int pprimaryVertexFilter = 1;           // Pass if it doesn't exist in the Forest
         int pclusterCompatibilityFilter = 1;
         int pphfCoincFilter2Th4 = 1;            // Different name from AOD
@@ -1106,6 +1214,17 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
         TH1D* h_lead_pho_PFCIso[neta][ncent];
         TH1D* h_lead_pho_R9[neta][ncent];
 
+        TH1D* h_lead_pho_SCRawE[neta][ncent];
+        TH1D* h_lead_pho_SCEtaWidth[neta][ncent];
+        TH1D* h_lead_pho_SCPhiWidth[neta][ncent];
+        TH1D* h_lead_pho_E3x3_2012[neta][ncent];
+        TH1D* h_lead_pho_MaxEnergyXtal_2012[neta][ncent];
+        TH1D* h_lead_pho_E2nd_2012[neta][ncent];
+        TH1D* h_lead_pho_E_LR[neta][ncent];
+        TH1D* h_lead_pho_E_TB[neta][ncent];
+        TH1D* h_lead_pho_SigmaIEtaIPhi_2012[neta][ncent];
+        TH1D* h_lead_pho_SigmaIPhiIPhi_2012[neta][ncent];
+
         TH1D* h_lead_ele_Pt[neta][ncent];
         TH1D* h_lead_ele_eta[neta][ncent];
         TH1D* h_lead_ele_SIEIE[neta][ncent];
@@ -1115,6 +1234,10 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
         TH1D* h_lead_ele_dEtaSeedAtVtx[neta][ncent];
         TH1D* h_lead_ele_dPhiAtVtx[neta][ncent];
         TH1D* h_lead_ele_EoverPInv[neta][ncent];
+
+        TH1D* h_lead_ele_R9[neta][ncent];
+        TH1D* h_lead_ele_IP3D[neta][ncent];
+        TH1D* h_lead_ele_NormChi2[neta][ncent];
 
         TH1D* h_sublead_ele_Pt[neta][ncent];
         TH1D* h_sublead_ele_eta[neta][ncent];
@@ -1128,8 +1251,8 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
 
         // TH1D* h_ele_Zmass[neta][ncent];    
 
-        const Int_t net_bins = 9;
-        Double_t et_edges[net_bins+1] = {20.0, 25, 30, 35, 40, 45, 50, 60, 80, 120}; 
+        const Int_t net_bins = 13;
+        Double_t et_edges[net_bins+1] = {20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 120, 150, 200}; 
 
         const Int_t iso_bins = 12;
         Double_t isolation_edges[iso_bins+1] = {-20,-10,-5,-3,-2,-1,1,2,3,5,10,15,30};
@@ -1160,17 +1283,33 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                 h_lead_pho_PFPIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFPIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFPIso_%zu_%zu;Leading #gamma pfpIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_PFNIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFNIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFNIso_%zu_%zu;Leading #gamma pfnIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
                 h_lead_pho_PFCIso[ieta][icent] = new TH1D(Form("h_lead_pho_PFCIso_%zu_%zu",ieta,icent),Form("h_lead_pho_PFCIso_%zu_%zu;Leading #gamma pfcIso3subUE;Norm. Events",ieta,icent),iso_bins, isolation_edges);
-                h_lead_pho_R9[ieta][icent] = new TH1D(Form("h_lead_pho_R9_%zu_%zu",ieta,icent),Form("h_lead_pho_R9_%zu_%zu;Leading #gamma R9;Norm. Events",ieta,icent),40,0,1.1);
+                h_lead_pho_R9[ieta][icent] = new TH1D(Form("h_lead_pho_R9_%zu_%zu",ieta,icent),Form("h_lead_pho_R9_%zu_%zu;Leading #gamma R_{9};Norm. Events",ieta,icent),40,0,1.1);
+                
+                h_lead_pho_SCRawE[ieta][icent] = new TH1D(Form("h_lead_pho_SCRawE_%zu_%zu",ieta,icent),Form("h_lead_pho_SCRawE_%zu_%zu;Leading #gamma SCRawE;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_SCEtaWidth[ieta][icent] = new TH1D(Form("h_lead_pho_SCEtaWidth_%zu_%zu",ieta,icent),Form("h_lead_pho_SCEtaWidth_%zu_%zu;Leading #gamma SCEtaWidth;Norm. Events",ieta,icent),40,0,0.05);
+                h_lead_pho_SCPhiWidth[ieta][icent] = new TH1D(Form("h_lead_pho_SCPhiWidth_%zu_%zu",ieta,icent),Form("h_lead_pho_SCPhiWidth_%zu_%zu;Leading #gamma SCPhiWidth;Norm. Events",ieta,icent),40,0,0.1);
+                h_lead_pho_E3x3_2012[ieta][icent] = new TH1D(Form("h_lead_pho_E3x3_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_E3x3_2012_%zu_%zu;Leading #gamma E3x3_2012;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_MaxEnergyXtal_2012[ieta][icent] = new TH1D(Form("h_lead_pho_MaxEnergyXtal_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_MaxEnergyXtal_2012_%zu_%zu;Leading #gamma MaxEnergyXtal_2012;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_E2nd_2012[ieta][icent] = new TH1D(Form("h_lead_pho_E2nd_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_E2nd_2012_%zu_%zu;Leading #gamma E2nd_2012;Norm. Events",ieta,icent),net_bins,et_edges);
+                h_lead_pho_E_LR[ieta][icent] = new TH1D(Form("h_lead_pho_E_LR_%zu_%zu",ieta,icent),Form("h_lead_pho_E_LR_%zu_%zu;Leading #gamma E_LR;Norm. Events",ieta,icent),40,0,0.1);
+                h_lead_pho_E_TB[ieta][icent] = new TH1D(Form("h_lead_pho_E_TB_%zu_%zu",ieta,icent),Form("h_lead_pho_E_TB_%zu_%zu;Leading #gamma E_TB;Norm. Events",ieta,icent),40,0,0.1);
+                h_lead_pho_SigmaIEtaIPhi_2012[ieta][icent] = new TH1D(Form("h_lead_pho_SigmaIEtaIPhi_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_SigmaIEtaIPhi_2012_%zu_%zu;Leading #gamma SigmaIEtaIPhi_2012;Norm. Events",ieta,icent),40,-0.001,0.001);
+                h_lead_pho_SigmaIPhiIPhi_2012[ieta][icent] = new TH1D(Form("h_lead_pho_SigmaIPhiIPhi_2012_%zu_%zu",ieta,icent),Form("h_lead_pho_SigmaIPhiIPhi_2012_%zu_%zu;Leading #gamma SigmaIPhiIPhi_2012;Norm. Events",ieta,icent),40,0,0.1);
+                
 
                 h_lead_ele_Pt[ieta][icent] = new TH1D(Form("h_lead_ele_Pt_%zu_%zu",ieta,icent),Form("h_lead_ele_Pt_%zu_%zu;Leading Electron p_{T} (GeV);Norm. Events",ieta,icent),net_bins,et_edges); // 30,0,150
                 h_lead_ele_eta[ieta][icent] = new TH1D(Form("h_lead_ele_eta_%zu_%zu",ieta,icent),Form("h_lead_ele_eta_%zu_%zu;Leading Electron SC #eta;Norm. Events",ieta,icent),10,-2.4,2.4);
                 h_lead_ele_phi[ieta][icent] = new TH1D(Form("h_lead_ele_phi_%zu_%zu",ieta,icent),Form("h_lead_ele_phi_%zu_%zu;Leading Electron SC #phi;Norm. Events",ieta,icent),10,-3.14,3.14);
                 h_lead_ele_HoverE[ieta][icent] = new TH1D(Form("h_lead_ele_HoverE_%zu_%zu",ieta,icent),Form("h_lead_ele_HoverE_%zu_%zu;Leading Electron H/E;Norm. Events",ieta,icent),20,0,0.1);
-                h_lead_ele_SIEIE[ieta][icent] = new TH1D(Form("h_lead_ele_SIEIE_%zu_%zu",ieta,icent),Form("h_lead_ele_SIEIE_%zu_%zu;Leading Electron #sigma_{#eta #eta};Norm. Events",ieta,icent),30,0,0.1);
+                h_lead_ele_SIEIE[ieta][icent] = new TH1D(Form("h_lead_ele_SIEIE_%zu_%zu",ieta,icent),Form("h_lead_ele_SIEIE_%zu_%zu;Leading Electron #sigma_{#eta #eta};Norm. Events",ieta,icent),30,0,0.02);
                 h_lead_ele_EoverP[ieta][icent] = new TH1D(Form("h_lead_ele_EoverP_%zu_%zu",ieta,icent),Form("h_lead_ele_EoverP_%zu_%zu;Leading Electron E/P;Norm. Events",ieta,icent),20,0,20);
                 h_lead_ele_dEtaSeedAtVtx[ieta][icent] = new TH1D(Form("h_lead_ele_dEtaSeedAtVtx_%zu_%zu",ieta,icent),Form("h_lead_ele_dEtaSeedAtVtx_%zu_%zu;Leading Electron #Delta #eta_{seed, Track};Norm. Events",ieta,icent),20,-0.02,0.02);
                 h_lead_ele_dPhiAtVtx[ieta][icent] = new TH1D(Form("h_lead_ele_dPhiAtVtx_%zu_%zu",ieta,icent),Form("h_lead_ele_dPhiAtVtx_%zu_%zu;Leading Electron #Delta #phi_{SC, Track};Norm. Events",ieta,icent),20,-0.2,0.2);
                 h_lead_ele_EoverPInv[ieta][icent] = new TH1D(Form("h_lead_ele_EoverPInv_%zu_%zu",ieta,icent),Form("h_lead_ele_EoverPInv_%zu_%zu;Leading Electron EoverPInv;Norm. Events",ieta,icent),20,-0.2,0.2);
+
+                h_lead_ele_R9[ieta][icent] = new TH1D(Form("h_lead_ele_R9_%zu_%zu",ieta,icent),Form("h_lead_ele_R9_%zu_%zu;Leading Electron R_{9};Norm. Events",ieta,icent),30,0,1.1);
+                h_lead_ele_IP3D[ieta][icent] = new TH1D(Form("h_lead_ele_IP3D_%zu_%zu",ieta,icent),Form("h_lead_ele_IP3D_%zu_%zu;Leading Electron IP3D;Norm. Events",ieta,icent),20,0,1);
+                h_lead_ele_NormChi2[ieta][icent] = new TH1D(Form("h_lead_ele_NormChi2_%zu_%zu",ieta,icent),Form("h_lead_ele_NormChi2_%zu_%zu;Leading Electron Norm #Chi^{2};Norm. Events",ieta,icent),40,0,40);
 
                 h_sublead_ele_Pt[ieta][icent] = new TH1D(Form("h_sublead_ele_Pt_%zu_%zu",ieta,icent),Form("h_sublead_ele_Pt_%zu_%zu;Sub-Leading Electron p_{T} (GeV);Norm. Events",ieta,icent),net_bins,et_edges); // 30,0,150
                 h_sublead_ele_eta[ieta][icent] = new TH1D(Form("h_sublead_ele_eta_%zu_%zu",ieta,icent),Form("h_sublead_ele_eta_%zu_%zu;Sub-Leading Electron SC #eta;Norm. Events",ieta,icent),10,-2.4,2.4);
@@ -1251,9 +1390,9 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     // if(!(isolation<5)) continue;
 
                     // Loose Photon ID
-                    if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
-                    if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
-                    if(!(isolation<11.697505)) continue;
+                    // if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
+                    // if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
+                    // if(!(isolation<11.697505)) continue;
 
                     h_lead_pho_et[ieta][icent]->Fill(         phoEt->at(pho_index), scale);
                     h_lead_pho_eta[ieta][icent]->Fill(        phoSCEta->at(pho_index), scale);
@@ -1268,6 +1407,17 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     h_lead_pho_PFNIso[ieta][icent]->Fill(     pfnIso3subUEec->at(pho_index), scale);
                     h_lead_pho_PFCIso[ieta][icent]->Fill(     pfcIso3subUEec->at(pho_index), scale);
                     h_lead_pho_R9[ieta][icent]->Fill(         phoR9_2012->at(pho_index), scale);
+
+                    h_lead_pho_SCRawE[ieta][icent]->Fill(                phoSCRawE->at(pho_index),scale);
+                    h_lead_pho_SCEtaWidth[ieta][icent]->Fill(            phoSCEtaWidth->at(pho_index),scale);
+                    h_lead_pho_SCPhiWidth[ieta][icent]->Fill(            phoSCPhiWidth->at(pho_index),scale);
+                    h_lead_pho_E3x3_2012[ieta][icent]->Fill(             phoE3x3_2012->at(pho_index),scale);
+                    h_lead_pho_MaxEnergyXtal_2012[ieta][icent]->Fill(    phoMaxEnergyXtal_2012->at(pho_index),scale);
+                    h_lead_pho_E2nd_2012[ieta][icent]->Fill(             phoE2nd_2012->at(pho_index),scale);
+                    h_lead_pho_E_LR[ieta][icent]->Fill(                  fabs(phoELeft_2012->at(pho_index)-phoERight_2012->at(pho_index))/(phoELeft_2012->at(pho_index)+phoERight_2012->at(pho_index)),scale);
+                    h_lead_pho_E_TB[ieta][icent]->Fill(                  fabs(phoEBottom_2012->at(pho_index)-phoETop_2012->at(pho_index))/(phoEBottom_2012->at(pho_index)+phoETop_2012->at(pho_index)),scale);
+                    h_lead_pho_SigmaIEtaIPhi_2012[ieta][icent]->Fill(    phoSigmaIEtaIPhi_2012->at(pho_index),scale);
+                    h_lead_pho_SigmaIPhiIPhi_2012[ieta][icent]->Fill(    phoSigmaIPhiIPhi_2012->at(pho_index),scale);
                 }
             }
         }
@@ -1330,10 +1480,10 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     
                     if(elePt->at(lead_ele_index)<40) continue;
                     Bool_t flagLooseEle = false;
-                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
-                        if(eleMissHits->at(lead_ele_index)>1) continue;
-                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
-                    }
+                    // if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                    //     if(eleMissHits->at(lead_ele_index)>1) continue;
+                    //     if(eleIP3D->at(lead_ele_index)>=0.03) continue;
+                    // }
                     // Electron Veto ID
                     if((hiBin)>=0 && (hiBin)<60){
                         if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0147) continue;
@@ -1352,7 +1502,7 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                         flagLooseEle=true;
                     }
 
-                    if(!flagLooseEle) continue;
+                    // if(!flagLooseEle) continue;
 
                     h_lead_ele_Pt[ieta][icent]->Fill(                elePt->at(lead_ele_index) ,scale);
                     h_lead_ele_eta[ieta][icent]->Fill(               eleEta->at(lead_ele_index) ,scale);
@@ -1363,6 +1513,10 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     h_lead_ele_dEtaSeedAtVtx[ieta][icent]->Fill(     eledEtaSeedAtVtx->at(lead_ele_index) ,scale);
                     h_lead_ele_dPhiAtVtx[ieta][icent]->Fill(         eledPhiAtVtx->at(lead_ele_index) ,scale);
                     h_lead_ele_EoverPInv[ieta][icent]->Fill(         eleEoverPInv->at(lead_ele_index) ,scale);
+
+                    h_lead_ele_R9[ieta][icent]->Fill(                eleR9Full5x5->at(lead_ele_index) ,scale);
+                    h_lead_ele_IP3D[ieta][icent]->Fill(              eleIP3D->at(lead_ele_index) ,scale);
+                    h_lead_ele_NormChi2[ieta][icent]->Fill(          eleTrkNormalizedChi2->at(lead_ele_index) ,scale);
                     
                 }
             }
@@ -1418,7 +1572,8 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
 
     } // End event loop
 
-    std::cout<<"\nNumber of selected photons = "<<h_lead_pho_et[0][0]->GetEntries()<<"\n";
+    std::cout<<"\nNumber of selected photons in 0,0 = "<<h_lead_pho_et[0][0]->GetEntries()<<"\n";
+    std::cout<<"Number of selected electrons in 0,0 = "<<h_lead_ele_Pt[0][0]->GetEntries()<<"\n\n";
 
     if(h_lead_pho_et[0][0]->GetEntries()==0){ std::cout<<"Return from function 0 entries => Not writing to file\n"; return;}
     
@@ -1444,6 +1599,17 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
             h_lead_pho_PFCIso[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_pho_R9[ieta][icent]->Write("",TObject::kOverwrite);
 
+            h_lead_pho_SCRawE[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SCEtaWidth[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SCPhiWidth[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E3x3_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_MaxEnergyXtal_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E2nd_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E_LR[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_E_TB[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SigmaIEtaIPhi_2012[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_pho_SigmaIPhiIPhi_2012[ieta][icent]->Write("",TObject::kOverwrite);
+        
             h_lead_ele_Pt[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_eta[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_SIEIE[ieta][icent]->Write("",TObject::kOverwrite);
@@ -1453,6 +1619,10 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
             h_lead_ele_dEtaSeedAtVtx[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_dPhiAtVtx[ieta][icent]->Write("",TObject::kOverwrite);
             h_lead_ele_EoverPInv[ieta][icent]->Write("",TObject::kOverwrite);
+
+            h_lead_ele_R9[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_ele_IP3D[ieta][icent]->Write("",TObject::kOverwrite);
+            h_lead_ele_NormChi2[ieta][icent]->Write("",TObject::kOverwrite);
 
             h_sublead_ele_Pt[ieta][icent]->Write("",TObject::kOverwrite);
             h_sublead_ele_eta[ieta][icent]->Write("",TObject::kOverwrite);
