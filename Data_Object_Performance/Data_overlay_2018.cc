@@ -104,17 +104,17 @@ void Data_overlay_2018(){
         fout_2023->Close();
         delete fout_2023;
 
-        fout_2023 = new TFile(DIR+"/Output_"+label+Tag+".root", "UPDATE");
-        fout_2023->cd();
+        // fout_2023 = new TFile(DIR+"/Output_"+label+Tag+".root", "UPDATE");
+        // fout_2023->cd();
 
-        files.clear();
-        input_dir_MC  = "/data_CMS/cms/bharikri/ECAL_study/old/EmEnrichedDijet_30/Run3_Reference/";
-        GetFiles(input_dir_MC.Data(), files,nfiles);
-        std::cout<<"Got "<<files.size()<<" files for EmEnrichedDijet_MC_ppNom \n";
-        Data_fill_pho_ele_2023(files,"EmEnrichedDijet_MC_ppNom",false);
-        std::cout<<Form("Output_%s%s.root",label.Data(),Tag.Data())<<" file created\n";
-        fout_2023->Close();
-        delete fout_2023;
+        // files.clear();
+        // input_dir_MC  = "/data_CMS/cms/bharikri/ECAL_study/old/EmEnrichedDijet_30/Run3_Reference/";
+        // GetFiles(input_dir_MC.Data(), files,nfiles);
+        // std::cout<<"Got "<<files.size()<<" files for EmEnrichedDijet_MC_ppNom \n";
+        // Data_fill_pho_ele_2023(files,"EmEnrichedDijet_MC_ppNom",false);
+        // std::cout<<Form("Output_%s%s.root",label.Data(),Tag.Data())<<" file created\n";
+        // fout_2023->Close();
+        // delete fout_2023;
     }
 
     if(flag_2023){
@@ -144,7 +144,7 @@ void Data_overlay_2018(){
             {DIR+"/Output_"+label+Tag+".root","2023_Oct_17_PromptHIPhysicsRawPrime","Physics Full Prompt Reco"},
             {DIR+"/Output_2018Data"+Tag+".root","2018_Data","2018 Data"},
             {DIR+"/Output_"+label+Tag+".root","QCDPhoton_MC_ppNom","2023 QCDPhoton MC-old ECAL"},
-            {DIR+"/Output_"+label+Tag+".root","EmEnrichedDijet_MC_ppNom","2023 EmEnrichedDijet MC-old ECAL"},
+            // {DIR+"/Output_"+label+Tag+".root","EmEnrichedDijet_MC_ppNom","2023 EmEnrichedDijet MC-old ECAL"},
         };
 
         std::vector<TString>histlist = {
@@ -203,13 +203,13 @@ void Data_overlay_2018(){
             for (std::size_t ieta = 0; ieta <=2; ++ieta){ //neta   {|eta|<1.44, 1.566<|eta|<2.1, 0<|eta|<2.4} 
                 int temp_hist_index = 1;
 
-                std::vector<TString>sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>40 + HLT40","No selections"}; // ,"NOT GEN MATCHED"
+                std::vector<TString>sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>40 + HLT40","Medium ID"}; // ,"NOT GEN MATCHED"
 
                 for(TString input_hist:histlist){
                     TString outplotname = input_hist;   
 
                     if(input_hist.Contains("sublead_ele"))
-                        sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>20","Any Double Ele trigger","Loose ID"}; // ,"NOT GEN MATCHED"
+                        sel = {"",Form("Cent. %d-%d%%",min_cent[icent]/2,max_cent[icent]/2),Form("%1.3f<|#eta|<%1.1f",min_eta[ieta],max_eta[ieta]),"p_{T}>20","Any Double Ele trigger","Medium ID"}; // ,"NOT GEN MATCHED"
                     
                     TString input_histname = Form("%s_%zu_%zu",outplotname.Data(),ieta,icent);
                     // std::cout<<"input hist = "<<input_hist<<"\n";
@@ -699,15 +699,33 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
 
                     // if(!(HLT_HIGEDPhoton20_v1 || HLT_HIGEDPhoton30_v1 || HLT_HIGEDPhoton40_v1)) continue;
                     if(!(HLT_HIGEDPhoton40_v1)) continue;
+                    Bool_t flagTightPhoton = false;
 
-                    double isolation=pho_ecalClusterIsoR3->at(pho_index)+pho_hcalRechitIsoR3->at(pho_index)+pho_trackIsoR3PtCut20->at(pho_index);
+                    // double isolation=pho_ecalClusterIsoR3->at(pho_index)+pho_hcalRechitIsoR3->at(pho_index)+pho_trackIsoR3PtCut20->at(pho_index);
+                    double isolation=pfcIso3subUE->at(pho_index)+pfnIso3subUE->at(pho_index)+pfpIso3subUE->at(pho_index);
                     // if(!(phoHoverE->at(pho_index)<=0.2)) continue;
                     // if(!(isolation<5)) continue;
 
-                    // Loose Photon ID
+                    // Loose Barrel Photon ID
                     // if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
                     // if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
                     // if(!(isolation<11.697505)) continue;
+
+                    // Tight Photon ID
+                    if(fabs(phoSCEta->at(pho_index))<1.44){
+                        if(!(phoHoverE->at(pho_index)<=0.141)) continue;
+                        if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.0107)) continue;
+                        if(!(isolation<4.808)) continue;
+                        flagTightPhoton = true;
+                    }
+                    else if(fabs(phoSCEta->at(pho_index))>1.57 && fabs(phoSCEta->at(pho_index))<2.1){
+                        if(!(phoHoverE->at(pho_index)<=0.227)) continue;
+                        if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.0287)) continue;
+                        if(!(isolation<5.634)) continue;
+                        flagTightPhoton = true;
+                    }
+
+                    if(!flagTightPhoton) continue;
 
                     h_lead_pho_et[ieta][icent]->Fill(         phoEt->at(pho_index), scale);
                     h_lead_pho_eta[ieta][icent]->Fill(        phoSCEta->at(pho_index), scale);
@@ -795,30 +813,51 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     if(eleEta->at(lead_ele_index)<-1.39 && elePhi->at(lead_ele_index)<-0.9 && elePhi->at(lead_ele_index)>-1.6) continue;
 
                     if(elePt->at(lead_ele_index)<40) continue;
-                    Bool_t flagLooseEle = false;
-                    // if(fabs(eleEta->at(lead_ele_index))<1.442) {
-                    //     if(eleMissHits->at(lead_ele_index)>1) continue;
-                    //     if(eleIP3D->at(lead_ele_index)>=0.03) continue;
-                    // }
-                    // Electron Veto ID
-                    if((hiBin)>=0 && (hiBin)<60){
-                        if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0147) continue;
-                        if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0041) continue;
-                        if(eledPhiAtVtx->at(lead_ele_index)>=0.0853) continue;
-                        if(eleHoverE->at(lead_ele_index)>=0.2733) continue;
-                        if(eleEoverPInv->at(lead_ele_index)>=0.0367) continue;
-                        flagLooseEle=true;
-                    }
-                    else{
-                        if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0113) continue;
-                        if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0037) continue;
-                        if(eledPhiAtVtx->at(lead_ele_index)>=0.1280) continue;
-                        if(eleHoverE->at(lead_ele_index)>=0.1814) continue;
-                        if(eleEoverPInv->at(lead_ele_index)>=0.1065) continue;
-                        flagLooseEle=true;
+                    Bool_t flagMediumEle = false;
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if(eleMissHits->at(lead_ele_index)>1) continue;
+                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
                     }
 
-                    // if(!flagLooseEle) continue;
+                    // Electron Medium ID
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0116) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0037) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0224) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1589) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0173) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0101) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0033) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0210) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0311) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0701) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+                    else if(fabs(eleEta->at(lead_ele_index))>1.57 && fabs(eleEta->at(lead_ele_index))<2.1) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0418) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0062) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0373) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1092) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0133) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0316) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0051) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0384) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0810) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0192) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+
+                    if(!flagMediumEle) continue;
 
                     h_lead_ele_Pt[ieta][icent]->Fill(                elePt->at(lead_ele_index) ,scale);
                     h_lead_ele_eta[ieta][icent]->Fill(               eleEta->at(lead_ele_index) ,scale);
@@ -850,30 +889,51 @@ void Data_fill_pho_ele_2018(std::vector<TString> in_file_path,TString in_label, 
                     if(eleEta->at(sublead_ele_index)<-1.39 && elePhi->at(sublead_ele_index)<-0.9 && elePhi->at(sublead_ele_index)>-1.6) continue;
 
                     if(elePt->at(sublead_ele_index)<20) continue;
-                    Bool_t flagLooseEle = false;
-                    if(fabs(eleEta->at(sublead_ele_index))<1.442) {
-                        if(eleMissHits->at(sublead_ele_index)>1) continue;
-                        if(eleIP3D->at(sublead_ele_index)>=0.03) continue;
-                    }
-                    // Electron Veto ID
-                    if((hiBin)>=0 && (hiBin)<60){
-                        if(eleSigmaIEtaIEta_2012->at(sublead_ele_index)>=0.0147) continue;
-                        if(eledEtaSeedAtVtx->at(sublead_ele_index)>=0.0041) continue;
-                        if(eledPhiAtVtx->at(sublead_ele_index)>=0.0853) continue;
-                        if(eleHoverE->at(sublead_ele_index)>=0.2733) continue;
-                        if(eleEoverPInv->at(sublead_ele_index)>=0.0367) continue;
-                        flagLooseEle=true;
-                    }
-                    else{
-                        if(eleSigmaIEtaIEta_2012->at(sublead_ele_index)>=0.0113) continue;
-                        if(eledEtaSeedAtVtx->at(sublead_ele_index)>=0.0037) continue;
-                        if(eledPhiAtVtx->at(sublead_ele_index)>=0.1280) continue;
-                        if(eleHoverE->at(sublead_ele_index)>=0.1814) continue;
-                        if(eleEoverPInv->at(sublead_ele_index)>=0.1065) continue;
-                        flagLooseEle=true;
+                    Bool_t flagMediumEle = false;
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if(eleMissHits->at(lead_ele_index)>1) continue;
+                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
                     }
 
-                    if(!flagLooseEle) continue;
+                    // Electron Medium ID
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0116) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0037) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0224) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1589) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0173) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0101) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0033) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0210) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0311) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0701) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+                    else if(fabs(eleEta->at(lead_ele_index))>1.57 && fabs(eleEta->at(lead_ele_index))<2.1) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0418) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0062) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0373) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1092) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0133) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0316) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0051) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0384) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0810) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0192) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+
+                    if(!flagMediumEle) continue;
 
                     h_sublead_ele_Pt[ieta][icent]->Fill(                elePt->at(sublead_ele_index) ,scale);
                     h_sublead_ele_eta[ieta][icent]->Fill(               eleEta->at(sublead_ele_index) ,scale);
@@ -1385,14 +1445,34 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     // if(!(HLT_HIGEDPhoton20_v10 || HLT_HIGEDPhoton30_v10 || HLT_HIGEDPhoton40_v10)) continue;
                     if(!(HLT_HIGEDPhoton40_v10)) continue;
 
-                    double isolation=pho_ecalClusterIsoR3->at(pho_index)+pho_hcalRechitIsoR3->at(pho_index)+pho_trackIsoR3PtCut20->at(pho_index);
+                    Bool_t flagTightPhoton = false;
+
+                    // double isolation=pho_ecalClusterIsoR3->at(pho_index)+pho_hcalRechitIsoR3->at(pho_index)+pho_trackIsoR3PtCut20->at(pho_index);
+                    double isolation=pfcIso3subUEec->at(pho_index)+pfnIso3subUEec->at(pho_index)+pfpIso3subUEec->at(pho_index);
                     // if(!(phoHoverE->at(pho_index)<=0.2)) continue;
                     // if(!(isolation<5)) continue;
 
-                    // Loose Photon ID
+                    // Loose Barrel Photon ID
                     // if(!(phoHoverE->at(pho_index)<=0.247995)) continue;
                     // if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.012186)) continue;
                     // if(!(isolation<11.697505)) continue;
+
+                    // Tight Photon ID
+                    if(fabs(phoSCEta->at(pho_index))<1.44){
+                        if(!(phoHoverE->at(pho_index)<=0.141)) continue;
+                        if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.0107)) continue;
+                        if(!(isolation<4.808)) continue;
+                        flagTightPhoton = true;
+                    }
+                    else if(fabs(phoSCEta->at(pho_index))>1.57 && fabs(phoSCEta->at(pho_index))<2.1){
+                        if(!(phoHoverE->at(pho_index)<=0.227)) continue;
+                        if(!(phoSigmaIEtaIEta_2012->at(pho_index)<=0.0287)) continue;
+                        if(!(isolation<5.634)) continue;
+                        flagTightPhoton = true;
+                    }
+
+                    if(!flagTightPhoton) continue;
+
 
                     h_lead_pho_et[ieta][icent]->Fill(         phoEt->at(pho_index), scale);
                     h_lead_pho_eta[ieta][icent]->Fill(        phoSCEta->at(pho_index), scale);
@@ -1479,30 +1559,51 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     if(!(HLT_HIEle40Gsf_v10)) continue;
                     
                     if(elePt->at(lead_ele_index)<40) continue;
-                    Bool_t flagLooseEle = false;
-                    // if(fabs(eleEta->at(lead_ele_index))<1.442) {
-                    //     if(eleMissHits->at(lead_ele_index)>1) continue;
-                    //     if(eleIP3D->at(lead_ele_index)>=0.03) continue;
-                    // }
-                    // Electron Veto ID
-                    if((hiBin)>=0 && (hiBin)<60){
-                        if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0147) continue;
-                        if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0041) continue;
-                        if(eledPhiAtVtx->at(lead_ele_index)>=0.0853) continue;
-                        if(eleHoverE->at(lead_ele_index)>=0.2733) continue;
-                        if(eleEoverPInv->at(lead_ele_index)>=0.0367) continue;
-                        flagLooseEle=true;
-                    }
-                    else{
-                        if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0113) continue;
-                        if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0037) continue;
-                        if(eledPhiAtVtx->at(lead_ele_index)>=0.1280) continue;
-                        if(eleHoverE->at(lead_ele_index)>=0.1814) continue;
-                        if(eleEoverPInv->at(lead_ele_index)>=0.1065) continue;
-                        flagLooseEle=true;
+                    Bool_t flagMediumEle = false;
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if(eleMissHits->at(lead_ele_index)>1) continue;
+                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
                     }
 
-                    // if(!flagLooseEle) continue;
+                    // Electron Medium ID
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0116) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0037) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0224) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1589) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0173) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0101) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0033) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0210) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0311) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0701) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+                    else if(fabs(eleEta->at(lead_ele_index))>1.57 && fabs(eleEta->at(lead_ele_index))<2.1) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0418) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0062) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0373) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1092) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0133) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0316) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0051) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0384) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0810) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0192) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+
+                    if(!flagMediumEle) continue;
 
                     h_lead_ele_Pt[ieta][icent]->Fill(                elePt->at(lead_ele_index) ,scale);
                     h_lead_ele_eta[ieta][icent]->Fill(               eleEta->at(lead_ele_index) ,scale);
@@ -1532,30 +1633,51 @@ void Data_fill_pho_ele_2023(std::vector<TString> in_file_path,TString in_label, 
                     if(!(HLT_HIEle15Ele10Gsf_v10 || HLT_HIEle15Ele10GsfMass50_v10 || HLT_HIDoubleEle10Gsf_v10 || HLT_HIDoubleEle10GsfMass50_v10 || HLT_HIDoubleEle15Gsf_v10 || HLT_HIDoubleEle15GsfMass50_v10)) continue;
 
                     if(elePt->at(sublead_ele_index)<20) continue;
-                    Bool_t flagLooseEle = false;
-                    if(fabs(eleEta->at(sublead_ele_index))<1.442) {
-                        if(eleMissHits->at(sublead_ele_index)>1) continue;
-                        if(eleIP3D->at(sublead_ele_index)>=0.03) continue;
-                    }
-                    // Electron Veto ID
-                    if((hiBin)>=0 && (hiBin)<60){
-                        if(eleSigmaIEtaIEta_2012->at(sublead_ele_index)>=0.0147) continue;
-                        if(eledEtaSeedAtVtx->at(sublead_ele_index)>=0.0041) continue;
-                        if(eledPhiAtVtx->at(sublead_ele_index)>=0.0853) continue;
-                        if(eleHoverE->at(sublead_ele_index)>=0.2733) continue;
-                        if(eleEoverPInv->at(sublead_ele_index)>=0.0367) continue;
-                        flagLooseEle=true;
-                    }
-                    else{
-                        if(eleSigmaIEtaIEta_2012->at(sublead_ele_index)>=0.0113) continue;
-                        if(eledEtaSeedAtVtx->at(sublead_ele_index)>=0.0037) continue;
-                        if(eledPhiAtVtx->at(sublead_ele_index)>=0.1280) continue;
-                        if(eleHoverE->at(sublead_ele_index)>=0.1814) continue;
-                        if(eleEoverPInv->at(sublead_ele_index)>=0.1065) continue;
-                        flagLooseEle=true;
+                    Bool_t flagMediumEle = false;
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if(eleMissHits->at(lead_ele_index)>1) continue;
+                        if(eleIP3D->at(lead_ele_index)>=0.03) continue;
                     }
 
-                    if(!flagLooseEle) continue;
+                    // Electron Medium ID
+                    if(fabs(eleEta->at(lead_ele_index))<1.442) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0116) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0037) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0224) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1589) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0173) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0101) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0033) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0210) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0311) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0701) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+                    else if(fabs(eleEta->at(lead_ele_index))>1.57 && fabs(eleEta->at(lead_ele_index))<2.1) {
+                        if((hiBin)>=0 && (hiBin)<60){
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0418) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0062) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0373) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.1092) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0133) continue;
+                            flagMediumEle=true;
+                        }
+                        else{
+                            if(eleSigmaIEtaIEta_2012->at(lead_ele_index)>=0.0316) continue;
+                            if(eledEtaSeedAtVtx->at(lead_ele_index)>=0.0051) continue;
+                            if(eledPhiAtVtx->at(lead_ele_index)>=0.0384) continue;
+                            if(eleHoverE->at(lead_ele_index)>=0.0810) continue;
+                            if(eleEoverPInv->at(lead_ele_index)>=0.0192) continue;
+                            flagMediumEle=true;
+                        }
+                    }
+
+                    if(!flagMediumEle) continue;
 
                     h_sublead_ele_Pt[ieta][icent]->Fill(                elePt->at(sublead_ele_index) ,scale);
                     h_sublead_ele_eta[ieta][icent]->Fill(               eleEta->at(sublead_ele_index) ,scale);
