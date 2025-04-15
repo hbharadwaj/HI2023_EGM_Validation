@@ -5,7 +5,7 @@ from Configuration.Generator.Herwig7Settings.Herwig7StableParticlesForDetector_c
 from Configuration.Generator.Herwig7Settings.Herwig7_7p1SettingsFor7p2_cfi import *
 from Configuration.Generator.Herwig7Settings.Herwig7LHECommonSettings_cfi import *
 
-#refer to: https://cms-pdmv-prod.web.cern.ch/mcm/requests?dataset_name=QCD_PThatGT15_TuneCP5_HydjetDrumMB_5p02TeV_herwig7
+#refer to: https://cms-pdmv-prod.web.cern.ch/mcm/requests?dataset_name=QCD_PtGT15_TuneCH3_5p02TeV_herwig7
 
 generator = cms.EDFilter("Herwig7GeneratorFilter",
 #generator = cms.EDFilter("ThePEGGeneratorFilter",
