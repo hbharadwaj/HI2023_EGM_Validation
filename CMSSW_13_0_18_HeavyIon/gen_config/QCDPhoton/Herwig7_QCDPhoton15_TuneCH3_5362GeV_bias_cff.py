@@ -65,3 +65,16 @@ generator = cms.EDFilter("Herwig7GeneratorFilter",
 #from GeneratorInterface.Core.ExternalGeneratorFilter import ExternalGeneratorFilter
 #generator = ExternalGeneratorFilter(_generator)
 ProductionFilterSequence = cms.Sequence(generator)
+
+# ------------------------------------
+# GenXsecAnalyzer:
+# ------------------------------------
+# Before Filter: total cross section = 3.253e+04 +- 5.683e+03 pb
+# Filter efficiency (taking into account weights)= (3.08419) / (3.08419) = 1.000e+00 +- 0.000e+00
+# Filter efficiency (event-level)= (200) / (200) = 1.000e+00 +- 0.000e+00    [TO BE USED IN MCM]
+                                                                                                                                                            
+# After filter: final cross section = 3.253e+04 +- 5.683e+03 pb
+# After filter: final fraction of events with negative weights = 0.000e+00 +- 0.000e+00
+# After filter: final equivalent lumi for 1M events (1/fb) = 3.074e-02 +- 5.371e-03
+
+# 1.23625 sec/output event, 1009.86 kB/output event
